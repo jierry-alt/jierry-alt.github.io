@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>♡｡Eternity.✨音乐网 | 沉浸式音乐体验</title>
+    
+    <!-- 外部资源 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- 引入分离出的 CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="marquee-container">
+        <div class="marquee">
+            <a href="https://kelayun.notepin.co" target="_blank" rel="noopener noreferrer">
+                🔥 ♡｡Eternity.✨
+            </a>
+            <a href="https://kelayun.notepin.co" target="_blank" rel="noopener noreferrer">
+                🔥 白嫖党
+            </a>
+        </div>
+    </div>
+
+    <div id="app" class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-8 main-content">
+        <!-- 你的页面内容保持不变 -->
+        <div class="text-center title-section">
+            <div class="inline-block mb-4">
+                <div class="relative">
+                    <div class="absolute inset-0 blur-2xl bg-purple-600/30 rounded-full"></div>
+                    <h1 class="relative main-title font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-clip-text text-transparent">
+                        ♡｡Eternity.✨音乐网
+                    </h1>
+                </div>
+            </div>
+            <p class="text-white/60 text-base">基于QQ音乐 · 高清无损 · 沉浸聆听</p>
+        </div>
+        
+        <div class="glass-modern rounded-2xl p-6 md:p-7 mb-6">
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+                <div class="text-white/80 text-base flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    音质选择
+                </div>
+                <div class="flex gap-3">
+                    <button v-for="q in qualities" :key="q.value" 
+                        @click="currentQuality = q.value; if(currentSong) refreshPlay()"
+                        class="quality-btn px-5 py-2 rounded-full font-semibold transition-all duration-300"
+                        :class="currentQuality === q.value ? 
+                            'quality-btn-active text-white shadow-lg' : 
+                            'bg-white/10 text-white/70 hover:bg-white/20'">
+                        {{ q.label }}
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-4 mb-5">
+                <div class="flex-1 relative">
+                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 text-lg">🔍</div>
+                    <input v-model="keyword" @keyup.enter="searchMusic" type="text" 
+                        placeholder="输入歌名、歌手，如「晴天」「周杰伦」「稻香」..." 
+                        class="search-input w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none transition-all focus:border-purple-500 text-base">
+                </div>
+                <button @click="searchMusic" :disabled="loading"
+                    class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[130px] shadow-lg hover:shadow-purple-500/25 text-base">
+                    <span v-if="loading" class="loader w-5 h-5 border-2"></span>
+                    <span>{{ loading ? '搜索中' : '🎵 搜索音乐' }}</span>
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2.5">
+                <span v-for="tag in quickTags" :key="tag" @click="keyword = tag; searchMusic()" 
+                    class="quick-tag px-4 py-2 rounded-full bg-white/10 text-white/80 hover:bg-purple-500/40 hover:text-white cursor-pointer transition-all duration-200 backdrop-blur-sm font-medium">
+                    🎧 {{ tag }}
+                </span>
+            </div>
+        </div>
+
+        <div v-if="currentSong" class="glass-card rounded-2xl p-6 md:p-7 mb-6 transition-all duration-500">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="relative">
+                    <img :src="currentSong.cover" class="w-36 h-36 md:w-40 md:h-40 rounded-2xl shadow-2xl object-cover rotate-slow" 
+                        @error="currentSong.cover = defaultCover">
+                    <div class="absolute -bottom-2 -right-2 w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-white text-sm">🎵</span>
+                    </div>
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <div class="mb-2">
+                        <span class="inline-block px-3 py-1 rounded-full text-sm bg-purple-500/40 text-purple-200 mb-2 font-medium">正在播放</span>
+                        <h2 class="now-playing-title font-bold text-white mb-1 leading-tight">{{ currentSong.name }}</h2>
+                        <p class="text-white/70 text-base">{{ currentSong.artist }}</p>
+                    </div>
+                    <audio :src="currentPlayUrl" controls autoplay class="w-full mt-4 rounded-lg" @error="onPlayError"></audio>
+                    <div v-if="playError" class="text-amber-300 text-sm mt-2 flex items-center justify-center md:justify-start gap-2">
+                        <span>⚠️ {{ playError }}</span>
+                        <button @click="refreshPlay" class="text-purple-300 underline text-sm">重试</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-modern rounded-2xl overflow-hidden">
+            <div class="px-6 py-5 border-b border-white/10 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🎧</span>
+                    <span class="text-white font-semibold text-lg">搜索结果</span>
+                    <span v-if="songs.length" class="result-count px-2.5 py-0.5 rounded-full text-sm bg-purple-500/30 text-purple-200 font-medium">{{ songs.length }}首</span>
+                </div>
+                <div v-if="songs.length" class="text-white/50 text-sm">点击歌曲即可播放</div>
+            </div>
+            
+            <div v-if="loading && !songs.length" class="p-16 text-center">
+                <div class="loader mx-auto mb-4"></div>
+                <p class="text-white/60 text-base">正在寻找音乐...</p>
+            </div>
+            
+            <div v-else-if="!songs.length && !loading" class="p-16 text-center">
+                <div class="text-7xl mb-4 opacity-50">🎼</div>
+                <p class="text-white/60 text-lg">输入关键词，开始音乐之旅</p>
+                <p class="text-white/40 text-base mt-2">试试「晴天」「稻香」「夜曲」</p>
+            </div>
+            
+            <div v-else class="divide-y divide-white/10 max-h-[550px] overflow-y-auto song-list">
+                <div v-for="(song, idx) in songs" :key="song.id" @click="playSong(song)"
+                    class="song-item p-4 flex items-center gap-4 cursor-pointer transition-all">
+                    <div class="text-white/50 w-10 text-center font-mono text-base font-medium">{{ String(idx+1).padStart(2, '0') }}</div>
+                    <div class="relative">
+                        <img :src="song.cover" class="w-14 h-14 rounded-lg object-cover shadow-md" @error="song.cover = defaultCover">
+                        <div v-if="currentSong && currentSong.id === song.id" class="absolute inset-0 bg-purple-600/60 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm font-bold">▶</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="song-name text-white font-semibold truncate">{{ song.name }}</div>
+                        <div class="artist-name text-white/50 text-sm truncate mt-0.5">{{ song.artist }}</div>
+                    </div>
+                    <div class="text-white/40 text-sm hidden sm:block">{{ song.duration }}</div>
+                    <div class="text-white/40 text-base opacity-0 group-hover:opacity-100 transition">▶</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-6 text-white/30 text-sm">
+            🎵 裤佬音乐网 · 用心聆听每一刻 🎵
+        </div>
+        
+        <transition name="fade">
+            <div v-if="message" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white px-5 py-2.5 rounded-full text-sm shadow-2xl z-50 flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                {{ message }}
+            </div>
+        </transition>
+    </div>
+
+    <!-- 引入分离出的 JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
