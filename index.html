@@ -9,9 +9,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         
         body {
             background: linear-gradient(135deg, #0a0f2e 0%, #1a0b3d 50%, #2a1b5e 100%);
@@ -75,20 +73,25 @@
             border-left: 4px solid #a5b4fc;
         }
 
-        .custom-player {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
-        }
-
         .main-title {
-            font-size: 3.2rem;
-            letter-spacing: -0.03em;
+            font-size: 2.4rem;
+            letter-spacing: -0.02em;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             .main-title {
-                font-size: 2.4rem;
+                font-size: 2.1rem;
             }
+        }
+
+        .quality-btn {
+            transition: all 0.3s ease;
+        }
+        .quality-btn-active {
+            background: linear-gradient(135deg, #a5b4fc, #c4b5fd);
+            color: #1e1b4b;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(165, 180, 252, 0.5);
         }
     </style>
 </head>
@@ -101,14 +104,24 @@
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 py-6 md:py-10 main-content">
+    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 py-6 md:py-10">
         
-        <!-- 标题 -->
+        <!-- 标题 + 音质切换 -->
         <div class="text-center mb-8">
             <h1 class="main-title font-bold bg-gradient-to-r from-indigo-300 via-violet-400 to-purple-300 bg-clip-text text-transparent">
                 ♡｡Eternity.✨音乐
             </h1>
-            <p class="text-white/60 mt-2 text-lg">沉浸式 · 高清无损 · 永恒聆听</p>
+            <p class="text-white/60 mt-1 text-base">沉浸式 · 高清无损 · 永恒聆听</p>
+
+            <!-- 音质选择 -->
+            <div class="flex justify-center gap-2 mt-5 flex-wrap">
+                <button v-for="q in qualities" :key="q.value"
+                    @click="currentQuality = q.value"
+                    class="quality-btn px-6 py-2 rounded-3xl text-sm font-medium border border-white/20 hover:border-violet-400"
+                    :class="{ 'quality-btn-active': currentQuality === q.value }">
+                    {{ q.label }}
+                </button>
+            </div>
         </div>
 
         <!-- 搜索区域 -->
@@ -131,13 +144,11 @@
         <!-- 当前播放器 -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 custom-player">
             <div class="flex flex-col md:flex-row items-center gap-6">
-                <!-- 封面 -->
                 <div class="relative flex-shrink-0">
                     <img :src="currentSong.cover" class="w-32 h-32 md:w-40 md:h-40 rounded-2xl shadow-2xl object-cover" @error="currentSong.cover = defaultCover">
                     <div class="absolute -bottom-1 -right-1 bg-violet-600 text-white text-xs px-2.5 py-1 rounded-full">NOW</div>
                 </div>
 
-                <!-- 歌曲信息 + 控制 -->
                 <div class="flex-1 w-full">
                     <div class="text-center md:text-left">
                         <h2 class="text-2xl font-bold mb-1">{{ currentSong.name }}</h2>
@@ -145,17 +156,17 @@
                     </div>
 
                     <!-- 自定义播放控件 -->
-                    <div class="flex items-center justify-center md:justify-start gap-6 mt-6">
-                        <button @click="prevSong" class="text-3xl hover:scale-110 transition">⏮</button>
-                        <button @click="togglePlay" class="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full text-4xl shadow-xl hover:scale-105 transition">
+                    <div class="flex items-center justify-center md:justify-start gap-8 mt-6">
+                        <button @click="prevSong" class="text-4xl hover:scale-110 transition">⏮</button>
+                        <button @click="togglePlay" 
+                            class="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full text-4xl shadow-xl hover:scale-105 transition">
                             {{ isPlaying ? '❚❚' : '▶' }}
                         </button>
-                        <button @click="nextSong" class="text-3xl hover:scale-110 transition">⏭</button>
+                        <button @click="nextSong" class="text-4xl hover:scale-110 transition">⏭</button>
                     </div>
-
-                    <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
                 </div>
             </div>
+            <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
         </div>
 
         <!-- 播放列表 -->
@@ -163,12 +174,12 @@
             <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/30">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">📜</span>
-                    <span class="font-semibold text-lg">我的播放列表 ({{ playlist.length }})</span>
+                    <span class="font-semibold text-lg">播放列表 ({{ playlist.length }})</span>
                 </div>
                 <button @click="clearPlaylist" class="text-white/60 hover:text-red-400 text-sm">清空</button>
             </div>
 
-            <div class="max-h-[420px] overflow-y-auto divide-y divide-white/10 song-list">
+            <div class="max-h-[420px] overflow-y-auto divide-y divide-white/10">
                 <div v-for="(song, idx) in playlist" :key="song.id + idx"
                      @click="playFromPlaylist(idx)"
                      class="song-item p-4 flex items-center gap-4 cursor-pointer">
@@ -220,8 +231,7 @@
     </div>
 
     <script>
-        const { createApp, ref, onMounted } = Vue;
-        
+        const { createApp } = Vue;
         const PROXY = 'https://seep.eu.org/';
 
         createApp({
@@ -234,11 +244,17 @@
                 const playlist = ref([]);
                 const currentIndex = ref(-1);
                 const isPlaying = ref(false);
-                const audioPlayer = ref(null);
+                const currentQuality = ref('flac');   // 默认无损
 
                 const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
 
-                // 你提供的专属歌单
+                const qualities = [
+                    { value: '128k', label: '标准' },
+                    { value: '320k', label: '高品质' },
+                    { value: 'flac', label: '无损' }
+                ];
+
+                // 你的专属歌单
                 const specialPlaylist = [
                     { id: 1001, name: "嘎嘎", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/yjarpu.flac" },
                     { id: 1002, name: "爱如星火", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/d5bklp.flac" },
@@ -253,13 +269,9 @@
                     { id: 1011, name: "空位", artist: "Eternity", cover: defaultCover, url: "https://streamshare.wireway.ch/download/yt5oyld9" }
                 ];
 
-                // 初始化时加载专属歌单
-                onMounted(() => {
-                    playlist.value = [...specialPlaylist];
-                    if (playlist.value.length > 0) {
-                        playSong(0);
-                    }
-                });
+                // 初始化加载专属歌单
+                playlist.value = [...specialPlaylist];
+                if (playlist.value.length > 0) playSong(0);
 
                 const searchMusic = async () => {
                     if (!keyword.value.trim()) return;
@@ -280,14 +292,12 @@
                         });
 
                         const songList = res.data?.req_1?.data?.body?.song?.list || [];
-
                         songs.value = songList.map(item => ({
                             id: item.id,
                             mid: item.mid,
                             name: item.name,
                             artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
-                            cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover,
-                            duration: item.interval ? `${Math.floor(item.interval/60)}:${(item.interval%60).toString().padStart(2,'0')}` : ''
+                            cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover
                         }));
                     } catch (e) {
                         alert('搜索失败，请稍后再试');
@@ -297,33 +307,35 @@
                 };
 
                 const getPlayUrl = (song) => {
-                    if (song.url) return song.url; // 专属歌单直接使用链接
-                    if (song.mid) return `https://music.nxinxz.com/kgqq/tx.php?id=${song.mid}&level=lossless&type=mp3`;
-                    return null;
+                    if (song.url) return song.url;
+                    if (!song.mid) return null;
+
+                    const levelMap = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
+                    return `https://music.nxinxz.com/kgqq/tx.php?id=${song.mid}&level=${levelMap[currentQuality.value]}&type=mp3`;
                 };
 
                 const playSong = (index) => {
                     if (index < 0 || index >= playlist.value.length) return;
-                    
                     currentIndex.value = index;
                     currentSong.value = playlist.value[index];
                     currentPlayUrl.value = getPlayUrl(currentSong.value);
 
-                    if (audioPlayer.value) {
-                        audioPlayer.value.src = currentPlayUrl.value;
-                        audioPlayer.value.play().then(() => {
-                            isPlaying.value = true;
-                        }).catch(() => {});
+                    const audio = document.querySelector('audio');
+                    if (audio) {
+                        audio.src = currentPlayUrl.value;
+                        audio.play().catch(() => {});
+                        isPlaying.value = true;
                     }
                 };
 
                 const togglePlay = () => {
-                    if (!audioPlayer.value) return;
+                    const audio = document.querySelector('audio');
+                    if (!audio) return;
                     if (isPlaying.value) {
-                        audioPlayer.value.pause();
+                        audio.pause();
                         isPlaying.value = false;
                     } else {
-                        audioPlayer.value.play();
+                        audio.play();
                         isPlaying.value = true;
                     }
                 };
@@ -345,22 +357,15 @@
                     playSong(playlist.value.length - 1);
                 };
 
-                const playFromPlaylist = (index) => {
-                    playSong(index);
-                };
+                const playFromPlaylist = (index) => playSong(index);
 
                 const removeFromPlaylist = (index) => {
-                    if (index === currentIndex.value) {
-                        nextSong();
-                    }
+                    if (index === currentIndex.value) nextSong();
                     playlist.value.splice(index, 1);
-                    if (currentIndex.value >= playlist.value.length) {
-                        currentIndex.value = playlist.value.length - 1;
-                    }
                 };
 
                 const clearPlaylist = () => {
-                    if (confirm('确定清空整个播放列表吗？')) {
+                    if (confirm('确定清空播放列表吗？')) {
                         playlist.value = [];
                         currentSong.value = null;
                         isPlaying.value = false;
@@ -368,20 +373,17 @@
                 };
 
                 const onPlayError = () => {
-                    alert('播放链接失效，已自动跳到下一首');
+                    alert('当前音质播放失败，已切换下一首');
                     nextSong();
                 };
 
                 return {
-                    keyword, songs, loading, currentSong, currentPlayUrl,
-                    playlist, isPlaying, audioPlayer,
+                    keyword, songs, loading, currentSong, currentPlayUrl, playlist, isPlaying,
+                    currentQuality, qualities,
                     searchMusic, togglePlay, nextSong, prevSong,
                     addToPlaylistAndPlay, playFromPlaylist, removeFromPlaylist, clearPlaylist,
                     onPlayError
                 };
-            },
-            mounted() {
-                this.audioPlayer = this.$refs.audioPlayer;
             }
         }).mount('#app');
     </script>
