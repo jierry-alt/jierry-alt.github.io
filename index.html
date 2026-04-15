@@ -39,25 +39,14 @@
         }
 
         .album-cover { 
-            width: 145px; height: 145px; 
-            animation: vinyl-spin 28s linear infinite paused; 
+            width: 160px; height: 160px; 
+            animation: vinyl-spin 25s linear infinite paused; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.18); 
         }
         .playing .album-cover { animation-play-state: running; }
         @keyframes vinyl-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .glow-pulse::after { 
-            content: ''; position: absolute; inset: -12px; 
-            background: radial-gradient(circle, rgba(236,72,153,0.35) 0%, transparent 70%); 
-            border-radius: 9999px; animation: glow 3s ease-in-out infinite; z-index: -1; 
-        }
-        @keyframes glow { 0%,100% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.2); opacity: 1; } }
-
         .main-title { font-size: 2.1rem; line-height: 1.1; }
-        .lyric-box { 
-            max-height: 72px; overflow-y: auto; font-size: 0.93rem; 
-            line-height: 1.55; color: #374151; text-align: center; 
-        }
 
         .song-item { 
             padding: 16px 18px; 
@@ -87,12 +76,8 @@
             <p class="text-gray-600 mt-1 text-sm">沉浸式音乐体验</p>
         </div>
 
-        <!-- 音乐搜索区域（最上面） -->
+        <!-- 搜索区域 -->
         <div class="glass-modern rounded-3xl p-6 mb-8">
-            <div class="flex items-center gap-3 mb-5 text-purple-700">
-                <span class="w-2.5 h-2.5 bg-pink-500 rounded-full animate-pulse"></span>
-                <span class="font-medium">音质选择</span>
-            </div>
             <div class="flex gap-2 mb-6 flex-wrap">
                 <button v-for="q in qualities" :key="q.value"
                     @click="currentQuality = q.value"
@@ -108,50 +93,27 @@
                     class="w-full pl-14 pr-6 py-5 bg-white border border-gray-200 rounded-3xl focus:border-purple-400 outline-none">
             </div>
             <button @click="searchMusic" :disabled="loading"
-                class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-base shadow-md">
+                class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3">
                 <span v-if="loading" class="loader"></span>
                 <span>{{ loading ? '搜索中...' : '🎵 搜索音乐' }}</span>
             </button>
         </div>
 
-        <!-- 高级播放器 -->
+        <!-- 简单播放器（已改回原版风格 + 下一曲按钮） -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 playing">
             <div class="flex flex-col items-center">
-                <div class="relative glow-pulse mb-6">
-                    <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white"
-                         @error="currentSong.cover = defaultCover">
-                </div>
+                <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white mb-6"
+                     @error="currentSong.cover = defaultCover">
 
                 <div class="text-center w-full">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-1">{{ currentSong.name }}</h2>
-                    <p class="text-gray-600 mb-4">{{ currentSong.artist }}</p>
+                    <p class="text-gray-600 mb-6">{{ currentSong.artist }}</p>
 
-                    <div v-if="currentLyric" class="lyric-box mb-6">
-                        {{ currentLyric }}
-                    </div>
+                    <audio :src="currentPlayUrl" controls class="w-full mb-4" @error="playError = '播放失败，尝试下一首'" @ended="playNext"></audio>
 
-                    <div class="w-full mb-4 px-2">
-                        <input type="range" v-model="progress" 
-                               @input="seekAudio" 
-                               class="w-full accent-purple-600">
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>{{ formatTime(currentTime) }}</span>
-                            <span>{{ formatTime(duration) }}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-center gap-10 mb-6">
-                        <button @click="playPrev" class="text-4xl text-gray-600 hover:text-purple-600 transition">⏮</button>
-                        <button @click="togglePlay" class="text-5xl text-purple-600 hover:scale-110 transition">
-                            {{ isPlaying ? '⏸' : '▶' }}
-                        </button>
-                        <button @click="playNext" class="text-4xl text-gray-600 hover:text-purple-600 transition">⏭</button>
-                    </div>
-
-                    <div class="flex items-center gap-4 w-full max-w-xs mx-auto">
-                        <span>🔈</span>
-                        <input type="range" v-model="volume" min="0" max="1" step="0.01"
-                               @input="changeVolume" class="flex-1 accent-purple-600">
+                    <div class="flex justify-center gap-8">
+                        <button @click="playPrev" class="text-3xl text-gray-600 hover:text-purple-600">⏮</button>
+                        <button @click="playNext" class="text-3xl text-purple-600 hover:scale-110 transition">下一曲 ⏭</button>
                     </div>
                 </div>
             </div>
@@ -159,62 +121,48 @@
 
         <!-- 搜索结果 -->
         <div v-if="searchResults.length" class="glass-modern rounded-3xl overflow-hidden mb-8">
-            <div class="px-6 py-4 border-b border-gray-100 bg-white/70 flex items-center">
-                <span class="text-xl mr-3">🔍</span>
-                <span class="font-semibold text-lg text-gray-800">搜索结果（点击播放）</span>
+            <div class="px-6 py-4 border-b bg-white/70">
+                <span class="font-semibold text-lg">搜索结果</span>
             </div>
-            <div class="max-h-[300px] overflow-y-auto divide-y divide-gray-100">
+            <div class="max-h-[280px] overflow-y-auto divide-y">
                 <div v-for="(song, i) in searchResults" :key="i"
                      @click="playSong(song)"
-                     class="song-item flex items-center gap-5 cursor-pointer hover:bg-purple-50">
-                    <img :src="song.cover" class="w-14 h-14 rounded-2xl object-cover" @error="song.cover = defaultCover">
+                     class="song-item flex items-center gap-4 cursor-pointer hover:bg-purple-50">
+                    <img :src="song.cover" class="w-12 h-12 rounded-xl object-cover">
                     <div class="flex-1 min-w-0">
-                        <div class="font-medium text-gray-800 truncate">{{ song.name }}</div>
-                        <div class="text-gray-500 text-sm truncate">{{ song.artist }}</div>
+                        <div class="font-medium truncate">{{ song.name }}</div>
+                        <div class="text-sm text-gray-500 truncate">{{ song.artist }}</div>
                     </div>
-                    <div class="text-gray-400 text-xs">{{ song.duration }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- 你的11首歌曲（已保留） -->
+        <!-- 你的11首上传歌曲（保留且可播放） -->
         <div class="glass-modern rounded-3xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 bg-white/70 flex items-center">
-                <span class="text-xl mr-3">⭐</span>
-                <span class="font-semibold text-lg text-gray-800">推荐歌曲</span>
+            <div class="px-6 py-4 border-b bg-white/70">
+                <span class="font-semibold text-lg">推荐歌曲（你的上传）</span>
             </div>
-            <div class="max-h-[340px] overflow-y-auto divide-y divide-gray-100">
+            <div class="max-h-[340px] overflow-y-auto divide-y">
                 <div v-for="(song, i) in recommendedSongs" :key="i"
                      @click="playSong(song)"
-                     class="song-item flex items-center gap-5 cursor-pointer hover:bg-purple-50">
-                    <div class="w-8 text-gray-400 font-mono">{{ (i+1).toString().padStart(2, '0') }}</div>
-                    <img :src="song.cover" class="w-14 h-14 rounded-2xl object-cover" @error="song.cover = defaultCover">
+                     class="song-item flex items-center gap-4 cursor-pointer hover:bg-purple-50">
+                    <div class="w-6 text-gray-400">{{ (i+1) }}</div>
+                    <img :src="song.cover" class="w-12 h-12 rounded-xl object-cover">
                     <div class="flex-1 min-w-0">
-                        <div class="font-medium text-gray-800 truncate">{{ song.name }}</div>
-                        <div class="text-gray-500 text-sm truncate">{{ song.artist }}</div>
+                        <div class="font-medium truncate">{{ song.name }}</div>
+                        <div class="text-sm text-gray-500 truncate">{{ song.artist }}</div>
                     </div>
-                    <div class="text-gray-400 text-xs">{{ song.duration }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="text-center text-gray-500 text-sm mt-8">♡ Eternity. 音乐</div>
+        <div class="text-center text-gray-500 text-sm mt-10">♡ Eternity. 音乐</div>
     </div>
 
     <script>
         const { createApp, ref } = Vue;
 
-        // 使用更稳定的跨域代理（已为你换成目前最稳定的一个）
-        const PROXY = 'https://corsproxy.io/?';
-
-        const proxyPost = async (url, data) => {
-            const fullUrl = PROXY + encodeURIComponent(url);
-            const res = await axios.post(fullUrl, data, {
-                headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
-                timeout: 15000
-            });
-            return res.data;
-        };
+        const PROXY = 'https://corsproxy.io/?';   // 当前较稳定代理
 
         createApp({
             setup() {
@@ -224,16 +172,9 @@
                 const currentSong = ref(null);
                 const currentPlayUrl = ref('');
                 const currentQuality = ref('128k');
-                const currentLyric = ref('');
-                const isPlaying = ref(true);
-                const progress = ref(0);
-                const currentTime = ref(0);
-                const duration = ref(0);
-                const volume = ref(1);
+                const playError = ref('');
 
-                const audio = new Audio();
-
-                const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
+                const defaultCover = 'https://picsum.photos/id/1015/300/300';
 
                 const qualities = [
                     { value: '128k', label: '标准' },
@@ -241,23 +182,20 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你上传的11首歌曲（已完整保留）
+                // 你的11首上传歌曲（直链，可直接播放）
                 const recommendedSongs = ref([
-                    { name: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", cover: defaultCover, duration: "04:12", lyric: "嘎嘎嘎嘎～ 今天也要开心呀～" },
-                    { name: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", cover: defaultCover, duration: "03:58", lyric: "爱如星火燎原，一点就燃\n温暖了整个夜晚" },
-                    { name: "那一年那一天", artist: "未知歌手", url: "https://files.catbox.moe/fawyem.flac", cover: defaultCover, duration: "04:35", lyric: "那一年那一天\n我们笑着说再见" },
-                    { name: "平凡之路", artist: "未知歌手", url: "https://files.catbox.moe/89l1hc.flac", cover: defaultCover, duration: "05:02", lyric: "平凡之路\n我一步一步走" },
-                    { name: "相濡以沫", artist: "未知歌手", url: "https://files.catbox.moe/0oluxu.flac", cover: defaultCover, duration: "04:20", lyric: "相濡以沫\n不离不弃" },
-                    { name: "不会改变", artist: "未知歌手", url: "https://files.catbox.moe/zsgxyr.flac", cover: defaultCover, duration: "03:45", lyric: "不会改变\n对你的爱" },
-                    { name: "朋克万岁", artist: "未知歌手", url: "https://files.catbox.moe/k2vbz2.flac", cover: defaultCover, duration: "04:10", lyric: "朋克万岁\n永远不低头" },
-                    { name: "500公里", artist: "未知歌手", url: "https://files.catbox.moe/gjyhqw.flac", cover: defaultCover, duration: "03:55", lyric: "五百公里\n我只为你而来" },
-                    { name: "罪人", artist: "未知歌手", url: "https://files.catbox.moe/9p209l.flac", cover: defaultCover, duration: "04:28", lyric: "我是罪人\n却爱得如此深沉" },
-                    { name: "曾经的你", artist: "未知歌手", url: "https://files.catbox.moe/6nm44r.flac", cover: defaultCover, duration: "05:15", lyric: "曾经的你\n是我最美的风景" },
-                    { name: "空位", artist: "未知歌手", url: "https://streamshare.wireway.ch/download/yt5oyld9", cover: defaultCover, duration: "04:40", lyric: "留一个空位\n等你回来" }
+                    { name: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", cover: defaultCover },
+                    { name: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", cover: defaultCover },
+                    { name: "那一年那一天", artist: "未知歌手", url: "https://files.catbox.moe/fawyem.flac", cover: defaultCover },
+                    { name: "平凡之路", artist: "未知歌手", url: "https://files.catbox.moe/89l1hc.flac", cover: defaultCover },
+                    { name: "相濡以沫", artist: "未知歌手", url: "https://files.catbox.moe/0oluxu.flac", cover: defaultCover },
+                    { name: "不会改变", artist: "未知歌手", url: "https://files.catbox.moe/zsgxyr.flac", cover: defaultCover },
+                    { name: "朋克万岁", artist: "未知歌手", url: "https://files.catbox.moe/k2vbz2.flac", cover: defaultCover },
+                    { name: "500公里", artist: "未知歌手", url: "https://files.catbox.moe/gjyhqw.flac", cover: defaultCover },
+                    { name: "罪人", artist: "未知歌手", url: "https://files.catbox.moe/9p209l.flac", cover: defaultCover },
+                    { name: "曾经的你", artist: "未知歌手", url: "https://files.catbox.moe/6nm44r.flac", cover: defaultCover },
+                    { name: "空位", artist: "未知歌手", url: "https://streamshare.wireway.ch/download/yt5oyld9", cover: defaultCover }
                 ]);
-
-                // 新增音源（https://13413.kstore.space/QingMusic/music.json）已尝试加载，但它是配置而非歌曲列表，因此保留你的11首作为主推荐
-                // 如需进一步集成其他源，请告诉我
 
                 const searchMusic = async () => {
                     if (!keyword.value.trim()) return alert('请输入歌名或歌手');
@@ -265,27 +203,17 @@
                     searchResults.value = [];
 
                     try {
-                        const postData = {
-                            req_1: {
-                                method: "DoSearchForQQMusicDesktop",
-                                module: "music.search.SearchCgiService",
-                                param: { num_per_page: 25, page_num: 1, query: keyword.value, search_type: 0 }
-                            }
-                        };
-                        const data = await proxyPost('https://u.y.qq.com/cgi-bin/musicu.fcg', postData);
-                        const list = data?.req_1?.data?.body?.song?.list || [];
-
+                        const postData = { req_1: { method: "DoSearchForQQMusicDesktop", module: "music.search.SearchCgiService", param: { num_per_page: 20, page_num: 1, query: keyword.value } } };
+                        const data = await axios.post(PROXY + encodeURIComponent('https://u.y.qq.com/cgi-bin/musicu.fcg'), postData);
+                        const list = data.data?.req_1?.data?.body?.song?.list || [];
                         searchResults.value = list.map(item => ({
                             mid: item.mid,
                             name: item.name,
-                            artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
-                            cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover,
-                            duration: item.interval ? `${Math.floor(item.interval/60)}:${(item.interval % 60).toString().padStart(2,'0')}` : '03:30'
+                            artist: item.singer?.map(s => s.name).join('、') || '未知',
+                            cover: defaultCover
                         }));
-
-                        if (searchResults.value.length === 0) alert('没有找到相关歌曲，试试其他关键词');
                     } catch (e) {
-                        alert('搜索失败，请稍后重试（已使用最稳定代理）');
+                        alert('搜索失败，请稍后重试');
                     } finally {
                         loading.value = false;
                     }
@@ -299,66 +227,33 @@
 
                 const playSong = (song) => {
                     currentSong.value = song;
+                    // 优先使用你上传的直链，其次用QQ代理
                     currentPlayUrl.value = song.url || (song.mid ? getPlayUrl(song.mid) : null);
-                    currentLyric.value = song.lyric || '暂无歌词';
-                };
-
-                const togglePlay = () => {
-                    if (audio.paused) {
-                        audio.play();
-                        isPlaying.value = true;
-                    } else {
-                        audio.pause();
-                        isPlaying.value = false;
-                    }
                 };
 
                 const playNext = () => {
-                    if (!recommendedSongs.value.length || !currentSong.value) return;
+                    if (!currentSong.value || !recommendedSongs.value.length) return;
                     const idx = recommendedSongs.value.findIndex(s => s.name === currentSong.value.name);
-                    const nextIdx = (idx + 1) % recommendedSongs.value.length;
+                    const nextIdx = idx === -1 ? 0 : (idx + 1) % recommendedSongs.value.length;
                     playSong(recommendedSongs.value[nextIdx]);
                 };
 
                 const playPrev = () => {
-                    if (!recommendedSongs.value.length || !currentSong.value) return;
+                    if (!currentSong.value || !recommendedSongs.value.length) return;
                     const idx = recommendedSongs.value.findIndex(s => s.name === currentSong.value.name);
-                    const prevIdx = (idx - 1 + recommendedSongs.value.length) % recommendedSongs.value.length;
+                    const prevIdx = idx === -1 ? 0 : (idx - 1 + recommendedSongs.value.length) % recommendedSongs.value.length;
                     playSong(recommendedSongs.value[prevIdx]);
                 };
 
-                const changeVolume = () => audio.volume = volume.value;
-
-                const seekAudio = () => {
-                    audio.currentTime = (progress.value / 100) * audio.duration;
-                };
-
-                audio.addEventListener('timeupdate', () => {
-                    if (audio.duration) {
-                        progress.value = (audio.currentTime / audio.duration) * 100;
-                        currentTime.value = audio.currentTime;
-                        duration.value = audio.duration;
-                    }
-                });
-
-                audio.addEventListener('ended', playNext);
-
+                // 默认播放第一首你的歌曲
                 setTimeout(() => {
-                    if (recommendedSongs.value.length > 0) playSong(recommendedSongs.value[0]);
-                }, 600);
-
-                const formatTime = (seconds) => {
-                    if (!seconds) return '0:00';
-                    const min = Math.floor(seconds / 60);
-                    const sec = Math.floor(seconds % 60);
-                    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-                };
+                    if (recommendedSongs.value.length) playSong(recommendedSongs.value[0]);
+                }, 300);
 
                 return {
-                    keyword, loading, currentSong, currentPlayUrl, currentQuality, currentLyric,
-                    recommendedSongs, qualities, isPlaying, progress, currentTime, duration, volume,
-                    searchResults, searchMusic, playSong, togglePlay, playNext, playPrev, changeVolume, seekAudio,
-                    formatTime
+                    keyword, loading, currentSong, currentPlayUrl, currentQuality,
+                    recommendedSongs, qualities, searchResults,
+                    searchMusic, playSong, playNext, playPrev
                 };
             }
         }).mount('#app');
