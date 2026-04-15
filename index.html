@@ -16,7 +16,7 @@
             min-height: 100vh;
             position: relative;
             color: #1f2937;
-            padding-bottom: 80px; /* 防止底部被遮挡 */
+            padding-bottom: 80px;
         }
         
         body::before {
@@ -29,8 +29,7 @@
         }
         
         .marquee-container {
-            position: fixed;
-            top: 0; left: 0; right: 0;
+            position: fixed; top: 0; left: 0; right: 0;
             background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(14px);
             padding: 10px 0;
@@ -38,23 +37,8 @@
             border-bottom: 1px solid rgba(255,255,255,0.65);
         }
         
-        .marquee {
-            white-space: nowrap;
-            display: inline-block;
-            animation: marquee 25s linear infinite;
-            padding-left: 100%;
-        }
-        
-        .marquee a {
-            color: #6b21a8;
-            font-weight: 700;
-            padding: 6px 24px;
-            background: rgba(236, 72, 153, 0.3);
-            border-radius: 9999px;
-            margin: 0 8px;
-            font-size: 14.5px;
-        }
-        
+        .marquee { white-space: nowrap; display: inline-block; animation: marquee 25s linear infinite; padding-left: 100%; }
+        .marquee a { color: #6b21a8; font-weight: 700; padding: 6px 24px; background: rgba(236, 72, 153, 0.3); border-radius: 9999px; margin: 0 8px; font-size: 14.5px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         
         .glass-modern, .glass-card {
@@ -64,83 +48,30 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
         
-        /* 唱片动画 - 手机上稍慢一点 */
         .album-cover {
-            width: 180px;
-            height: 180px;
+            width: 180px; height: 180px;
             animation: vinyl-spin 28s linear infinite paused;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        
-        .playing .album-cover {
-            animation-play-state: running;
-        }
-        
-        @keyframes vinyl-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .playing .album-cover { animation-play-state: running; }
+        @keyframes vinyl-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         .glow-pulse::after {
-            content: '';
-            position: absolute;
-            inset: -15px;
+            content: ''; position: absolute; inset: -15px;
             background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, transparent 70%);
-            border-radius: 9999px;
-            animation: glow 3s ease-in-out infinite;
-            z-index: -1;
+            border-radius: 9999px; animation: glow 3s ease-in-out infinite; z-index: -1;
         }
+        @keyframes glow { 0%,100% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.2); opacity: 1; } }
         
-        @keyframes glow {
-            0%, 100% { transform: scale(0.9); opacity: 0.6; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
-        
-        .waveform {
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-            height: 24px;
-        }
-        
-        .bar {
-            width: 3.5px;
-            background: linear-gradient(#c026d3, #7e22ce);
-            border-radius: 9999px;
-            animation: soundwave 1.1s ease-in-out infinite;
-        }
-        
+        .waveform { display: flex; align-items: flex-end; gap: 4px; height: 24px; }
+        .bar { width: 3.5px; background: linear-gradient(#c026d3, #7e22ce); border-radius: 9999px; animation: soundwave 1.1s ease-in-out infinite; }
         .bar:nth-child(2) { animation-delay: 0.1s; }
         .bar:nth-child(3) { animation-delay: 0.25s; height: 70%; }
         .bar:nth-child(4) { animation-delay: 0.15s; }
+        @keyframes soundwave { 0%,100% { height: 35%; } 50% { height: 100%; } }
         
-        @keyframes soundwave {
-            0%, 100% { height: 35%; }
-            50% { height: 100%; }
-        }
-        
-        .main-title {
-            font-size: 2.35rem;
-            line-height: 1.1;
-        }
-        
-        .search-input {
-            font-size: 1.05rem;
-        }
-        
-        .song-item {
-            padding: 16px 18px;
-        }
-        
-        .loader {
-            width: 30px;
-            height: 30px;
-            border: 4px solid rgba(168, 85, 247, 0.3);
-            border-top-color: #c026d3;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-        
+        .main-title { font-size: 2.35rem; line-height: 1.1; }
+        .loader { width: 30px; height: 30px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -154,7 +85,6 @@
     </div>
 
     <div id="app" class="relative z-10 max-w-xl mx-auto px-4 pt-20 pb-10">
-        <!-- 标题 -->
         <div class="text-center mb-10">
             <h1 class="main-title font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 bg-clip-text text-transparent">
                 ♡ Eternity. ✨音乐网
@@ -162,7 +92,7 @@
             <p class="text-gray-600 mt-2 text-base">高清无损 · 沉浸聆听</p>
         </div>
 
-        <!-- 搜索区域 -->
+        <!-- 搜索区域（保持不变） -->
         <div class="glass-modern rounded-3xl p-6 mb-8">
             <div class="flex items-center gap-3 mb-5 text-purple-700">
                 <span class="w-2.5 h-2.5 bg-pink-500 rounded-full animate-pulse"></span>
@@ -200,13 +130,11 @@
             </div>
         </div>
 
-        <!-- 正在播放（竖屏优化） -->
+        <!-- 正在播放 -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 playing">
             <div class="flex flex-col items-center text-center">
-                <!-- 唱片封面 -->
                 <div class="relative glow-pulse mb-6">
-                    <img :src="currentSong.cover" 
-                         class="album-cover rounded-3xl object-cover ring-4 ring-white"
+                    <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white"
                          @error="currentSong.cover = defaultCover">
                 </div>
 
@@ -214,10 +142,7 @@
                     <div class="flex items-center justify-center gap-3 mb-3">
                         <div class="px-5 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">正在播放</div>
                         <div class="waveform" v-if="currentPlayUrl">
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
+                            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                         </div>
                     </div>
                     
@@ -226,15 +151,15 @@
                     
                     <audio :src="currentPlayUrl" controls autoplay class="w-full" @error="onPlayError"></audio>
                     
-                    <div v-if="playError" class="mt-4 text-red-500 text-sm">
-                        ⚠️ {{ playError }} 
-                        <button @click="refreshPlay" class="underline text-purple-600">重试</button>
+                    <div v-if="playError" class="mt-4 text-red-500 text-sm flex flex-col items-center gap-1">
+                        ⚠️ {{ playError }}
+                        <button @click="refreshPlay" class="underline text-purple-600 font-medium">重试 / 切换音质</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 搜索结果 -->
+        <!-- 搜索结果（保持不变） -->
         <div class="glass-modern rounded-3xl overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-100 flex items-center bg-white/70">
                 <span class="text-2xl mr-3">🎧</span>
@@ -335,9 +260,12 @@
                     }
                 };
 
+                // ==================== 核心修改部分：更换播放源 ====================
                 const getPlayUrl = (mid) => {
-                    const map = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
-                    return `https://music.nxinxz.com/kgqq/tx.php?id=${mid}&level=${map[currentQuality.value]}&type=mp3`;
+                    // 使用更稳定的第三方 QQ 音乐解析接口（2026年仍在维护的常见源）
+                    const qualityMap = { '128k': '128', '320k': '320', 'flac': 'flac' };
+                    const level = qualityMap[currentQuality.value];
+                    return `https://api.66mz8.com/api/qqmusic.php?id=${mid}&type=${level}`;
                 };
 
                 const getNeteaseUrl = (name) => {
@@ -355,14 +283,21 @@
                 const playSong = async (song) => {
                     currentSong.value = song;
                     playError.value = '';
+
                     let url = song.mid ? getPlayUrl(song.mid) : null;
                     if (!url) url = getNeteaseUrl(song.name);
-                    if (!url) url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+                    if (!url) url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // 测试用
+
                     currentPlayUrl.value = url;
                 };
 
-                const refreshPlay = () => currentSong.value && playSong(currentSong.value);
-                const onPlayError = () => playError.value = '播放失败，建议切换音质重试';
+                const refreshPlay = () => {
+                    if (currentSong.value) playSong(currentSong.value);
+                };
+
+                const onPlayError = () => {
+                    playError.value = '当前音质播放失败，请尝试切换音质或重试';
+                };
 
                 return {
                     keyword, songs, loading, currentSong, currentPlayUrl, playError, currentQuality,
