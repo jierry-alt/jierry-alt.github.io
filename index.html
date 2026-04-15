@@ -34,10 +34,17 @@
             border: 1px solid rgba(255,255,255,0.85); box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
 
-        /* 播放器缩小 */
+        /* 播放器 + 列表合体 - 更精致紧凑 */
+        .combined-card {
+            background: rgba(255,255,255,0.92); 
+            backdrop-filter: blur(22px); 
+            border: 1px solid rgba(255,255,255,0.9); 
+            box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+        }
+
         .album-cover { 
-            width: 140px; 
-            height: 140px; 
+            width: 130px; 
+            height: 130px; 
             animation: vinyl-spin 28s linear infinite paused; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
         }
@@ -59,24 +66,22 @@
         @keyframes soundwave { 0%,100% { height: 35%; } 50% { height: 100%; } }
 
         .main-title { font-size: 2.05rem; line-height: 1.1; }
-
         .lyric-box { 
-            max-height: 68px; overflow-y: auto; font-size: 0.9rem; 
+            max-height: 66px; overflow-y: auto; font-size: 0.9rem; 
             line-height: 1.45; color: #4b5563; text-align: center; 
-            padding: 0 8px;
         }
 
-        /* 歌曲列表缩小 */
+        /* 列表更紧凑 */
         .playlist-item { 
-            padding: 12px 16px; 
-            font-size: 0.95rem;
+            padding: 10px 16px; 
+            font-size: 0.93rem;
         }
-        .playlist-item .w-12 { width: 48px; height: 48px; }
+        .playlist-item .w-11 { width: 44px; height: 44px; }
 
         .loader { width: 26px; height: 26px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* GIF 调大 */
+        /* GIF 保持较大 */
         .bottom-gif-container {
             margin-top: 50px;
             margin-bottom: 40px;
@@ -111,53 +116,54 @@
             <p class="text-gray-600 mt-1 text-sm">沉浸式音乐体验</p>
         </div>
 
-        <!-- 正在播放（已缩小） -->
-        <div v-if="currentSong" class="glass-card rounded-3xl p-5 mb-8 playing">
-            <div class="flex flex-col items-center">
-                <div class="relative glow-pulse mb-5">
-                    <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white"
-                         @error="currentSong.cover = defaultCover">
-                </div>
+        <!-- 播放器 + 列表 合体卡片（更精致紧凑） -->
+        <div class="combined-card rounded-3xl overflow-hidden mb-12">
+            <!-- 正在播放部分 -->
+            <div v-if="currentSong" class="p-6 border-b border-gray-100 playing">
+                <div class="flex flex-col items-center">
+                    <div class="relative glow-pulse mb-5">
+                        <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white"
+                             @error="currentSong.cover = defaultCover">
+                    </div>
 
-                <div class="text-center w-full px-2">
-                    <div class="flex justify-center items-center gap-3 mb-2">
-                        <div class="px-4 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">正在播放</div>
-                        <div class="waveform" v-if="currentPlayUrl">
-                            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="text-center w-full">
+                        <div class="flex justify-center items-center gap-3 mb-2">
+                            <div class="px-4 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">正在播放</div>
+                            <div class="waveform" v-if="currentPlayUrl">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                            </div>
                         </div>
+                        
+                        <h2 class="text-xl font-semibold text-gray-800 mb-1">{{ currentSong.name }}</h2>
+                        <p class="text-gray-600 mb-4">{{ currentSong.artist }}</p>
+
+                        <div v-if="currentLyric" class="lyric-box mb-4 border-t border-b border-gray-100 py-2">
+                            {{ currentLyric }}
+                        </div>
+
+                        <audio :src="currentPlayUrl" controls autoplay class="w-full mb-4" @error="onPlayError" @ended="playNext"></audio>
+
+                        <button @click="playNext"
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-7 py-2.5 rounded-2xl font-medium flex items-center gap-2 mx-auto text-sm">
+                            下一首 ⏭
+                        </button>
                     </div>
-                    
-                    <h2 class="text-xl font-semibold text-gray-800 mb-1">{{ currentSong.name }}</h2>
-                    <p class="text-gray-600 mb-4">{{ currentSong.artist }}</p>
-
-                    <div v-if="currentLyric" class="lyric-box mb-4 border-t border-b border-gray-100 py-2">
-                        {{ currentLyric }}
-                    </div>
-
-                    <audio :src="currentPlayUrl" controls autoplay class="w-full mb-4" @error="onPlayError" @ended="playNext"></audio>
-
-                    <button @click="playNext"
-                        class="bg-purple-500 hover:bg-purple-600 text-white px-7 py-2.5 rounded-2xl font-medium flex items-center gap-2 mx-auto text-sm">
-                        下一首 ⏭
-                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- 播放列表（已缩小） -->
-        <div class="glass-modern rounded-3xl overflow-hidden mb-12">
+            <!-- 播放列表部分 -->
             <div class="px-6 py-4 border-b border-gray-100 bg-white/70 flex items-center">
                 <span class="text-xl mr-3">📜</span>
                 <span class="font-semibold text-lg text-gray-800">播放列表</span>
                 <span class="ml-auto text-xs text-gray-500">{{ playlist.length }} 首</span>
             </div>
-            <div class="max-h-[380px] overflow-y-auto divide-y divide-gray-100">
+            <div class="max-h-[340px] overflow-y-auto divide-y divide-gray-100">
                 <div v-for="(song, i) in playlist" :key="i"
                      @click="playSong(song)"
                      class="playlist-item flex items-center gap-4 p-4 cursor-pointer active:bg-purple-50"
                      :class="{ active: currentSong && currentSong.name === song.name }">
                     <div class="w-7 text-gray-400 font-mono text-sm">{{ (i+1).toString().padStart(2, '0') }}</div>
-                    <img :src="song.cover" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" @error="song.cover = defaultCover">
+                    <img :src="song.cover" class="w-11 h-11 rounded-xl object-cover flex-shrink-0" @error="song.cover = defaultCover">
                     <div class="flex-1 min-w-0">
                         <div class="font-medium text-gray-800 truncate text-[15px]">{{ song.name }}</div>
                         <div class="text-gray-500 text-xs truncate">{{ song.artist }}</div>
@@ -194,7 +200,7 @@
             </button>
         </div>
 
-        <!-- GIF（已调大） -->
+        <!-- GIF -->
         <div class="bottom-gif-container">
             <img src="https://qu.ax/PVqCB.gif" 
                  class="bottom-gif" 
