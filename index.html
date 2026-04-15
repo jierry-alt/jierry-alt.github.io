@@ -25,61 +25,47 @@
             font-size: 17px; text-shadow: 0 0 10px #c4b5fd;
             animation: snowfall linear infinite; opacity: 0.8;
         }
-        @keyframes snowfall {
-            to { transform: translateY(110vh) rotate(720deg); }
-        }
+        @keyframes snowfall { to { transform: translateY(110vh) rotate(720deg); } }
+        
         .marquee-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 8px 0;
-            z-index: 50;
-            overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            padding: 9px 0; z-index: 50; overflow: hidden;
         }
         .marquee {
-            white-space: nowrap;
-            animation: marquee 25s linear infinite;
-            color: #d8b4fe;
-            font-size: 14px;
-            font-weight: 600;
+            white-space: nowrap; animation: marquee 22s linear infinite;
+            color: #d8b4fe; font-size: 15px; font-weight: 700;
         }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        .glass { 
-            background: rgba(30, 11, 61, 0.88); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(192, 132, 252, 0.45); 
-        }
+        
+        .glass { background: rgba(30, 11, 61, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(192, 132, 252, 0.45); }
         .title { 
-            font-size: 2.55rem; 
-            font-weight: 900; 
-            letter-spacing: -0.03em;
+            font-size: 2.55rem; font-weight: 900; letter-spacing: -0.03em;
             background: linear-gradient(90deg, #f472b6, #e879f9, #c026d3);
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .main-content { padding-top: 68px; } /* 向上提 */
+        .main-content { padding-top: 68px; }
     </style>
 </head>
 <body>
-    <!-- 雪花 -->
     <div class="snow" id="snow"></div>
 
-    <!-- 跑马灯 -->
+    <!-- 跑马灯：只保留指定内容 -->
     <div class="marquee-container">
         <div class="marquee">
-            <span>犯我中华者，虽远必诛！ 限设备不限地区</span>
-            <span>犯我中华者，虽远必诛！ 限设备不限地区</span>
+            <span>犯我中华者，虽远必诛！</span>
+            <span>犯我中华者，虽远必诛！</span>
+            <span>犯我中华者，虽远必诛！</span>
         </div>
     </div>
 
     <div id="app" class="relative z-10 max-w-xl mx-auto px-4 main-content">
-        <!-- 大标题 - 向上移动 -->
+        <!-- 主题标题 -->
         <div class="text-center mb-6">
             <h1 class="title">二宝子专属</h1>
         </div>
 
-        <!-- 音源选择 + 搜索区域 -->
+        <!-- 搜索与音源区 -->
         <div class="glass rounded-3xl p-6 mb-7">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
@@ -144,13 +130,10 @@
             </button>
         </div>
 
-        <!-- 搜索结果区域 -->
+        <!-- 搜索结果 -->
         <div v-if="searchResults.length > 0" class="glass rounded-3xl p-5 mb-7">
-            <div class="font-semibold text-lg mb-4 flex items-center gap-2">
-                <span>🔍 搜索结果</span>
-                <span class="text-sm text-purple-300">({{ searchResults.length }} 首)</span>
-            </div>
-            <div class="divide-y divide-purple-400/20 max-h-[280px] overflow-y-auto">
+            <div class="font-semibold text-lg mb-4">🔍 搜索结果 ({{ searchResults.length }} 首)</div>
+            <div class="divide-y divide-purple-400/20 max-h-[260px] overflow-y-auto">
                 <div v-for="song in searchResults" :key="song.id" 
                      @click="playSong(song)"
                      class="py-4 flex gap-4 items-center cursor-pointer hover:bg-white/5">
@@ -163,13 +146,13 @@
             </div>
         </div>
 
-        <!-- 播放列表 -->
+        <!-- 播放列表（已添加11首歌） -->
         <div class="glass rounded-3xl overflow-hidden">
-            <div class="px-6 py-5 border-b border-purple-400/30 bg-black/30 flex justify-between">
+            <div class="px-6 py-5 border-b border-purple-400/30 bg-black/30 flex justify-between items-center">
                 <span class="font-bold text-lg">播放列表 ({{ playlist.length }} 首)</span>
                 <span class="text-purple-300 text-sm">点击播放</span>
             </div>
-            <div class="max-h-[360px] overflow-y-auto divide-y divide-purple-400/10">
+            <div class="max-h-[380px] overflow-y-auto divide-y divide-purple-400/10">
                 <div v-for="(song, idx) in playlist" :key="song.id" 
                      @click="playSong(song)"
                      class="px-6 py-4 flex items-center gap-4 cursor-pointer hover:bg-white/5">
@@ -194,6 +177,7 @@
         
         const defaultCover = 'https://picsum.photos/id/1015/300/300';
 
+        // 你上传的11首歌曲（已完整添加）
         const builtInPlaylist = [
             { id: 1, title: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", artwork: "https://picsum.photos/id/1015/300/300", duration: "04:12" },
             { id: 2, title: "那一年那一天", artist: "未知歌手", url: "https://files.catbox.moe/fawyem.flac", artwork: "https://picsum.photos/id/102/300/300", duration: "05:05" },
@@ -271,8 +255,7 @@
                     }
                     const term = keyword.value.toLowerCase();
                     searchResults.value = playlist.value.filter(song => 
-                        song.title.toLowerCase().includes(term) || 
-                        song.artist.toLowerCase().includes(term)
+                        song.title.toLowerCase().includes(term) || song.artist.toLowerCase().includes(term)
                     );
                 };
 
