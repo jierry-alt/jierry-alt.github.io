@@ -75,19 +75,19 @@
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* GIF 放在文字底下 */
+        /* GIF 放在文字下面，全屏宽度 */
         .bottom-gif-container {
-            margin-top: 60px;
+            margin-top: 50px;
+            width: 100%;
             display: flex;
             justify-content: center;
         }
         .bottom-gif {
-            max-width: 420px;
-            width: 94%;
+            width: 100%;
+            max-width: 100%;
             height: auto;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            border: 8px solid rgba(255,255,255,0.9);
+            border-radius: 0; /* 全屏效果，去掉圆角 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
     </style>
 </head>
@@ -200,7 +200,7 @@
             </div>
         </div>
 
-        <!-- GIF 放在文字的下面 -->
+        <!-- GIF 放在文字下面，全屏宽度 -->
         <div class="bottom-gif-container">
             <img src="https://qu.ax/PVqCB.gif" 
                  class="bottom-gif" 
