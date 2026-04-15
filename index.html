@@ -15,7 +15,7 @@
             min-height: 100vh; 
             position: relative; 
             color: #1f2937; 
-            padding-bottom: 0; /* 让GIF完全占满底部 */
+            padding-bottom: 40px;
         }
         body::before {
             content: ''; position: fixed; inset: 0;
@@ -75,24 +75,19 @@
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* GIF 固定在最底部全屏铺满 */
+        /* GIF 放在文字底下 */
         .bottom-gif-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 280px;           /* 可微调高度，更大就调高此值 */
-            z-index: 5;
+            margin-top: 60px;
             display: flex;
-            align-items: flex-end;
             justify-content: center;
-            pointer-events: none;
         }
         .bottom-gif {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;       /* 布满全屏 */
-            opacity: 0.95;
+            max-width: 420px;
+            width: 94%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border: 8px solid rgba(255,255,255,0.9);
         }
     </style>
 </head>
@@ -105,7 +100,7 @@
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-xl mx-auto px-4 pt-20 pb-8">
+    <div id="app" class="relative z-10 max-w-xl mx-auto px-4 pt-20 pb-12">
         <!-- 标题 -->
         <div class="text-center mb-8">
             <h1 class="main-title font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 bg-clip-text text-transparent">
@@ -205,14 +200,14 @@
             </div>
         </div>
 
-        <!-- GIF 布满最下面全屏 -->
+        <!-- GIF 放在文字的下面 -->
         <div class="bottom-gif-container">
             <img src="https://qu.ax/PVqCB.gif" 
                  class="bottom-gif" 
                  alt="Eternity 音乐装饰">
         </div>
 
-        <div class="text-center text-gray-500 text-sm mt-6 relative z-20">♡ Eternity. 音乐</div>
+        <div class="text-center text-gray-500 text-sm mt-8">♡ Eternity. 音乐</div>
     </div>
 
     <script>
