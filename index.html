@@ -2,99 +2,112 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.0">
     <title>♡｡Eternity.✨音乐网 | 沉浸式音乐体验</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        * { font-family: 'Inter', system-ui, sans-serif; }
         
         body {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background: linear-gradient(135deg, #1a0f2e 0%, #3b1e5e 50%, #4c2a7a 100%);
             min-height: 100vh;
             position: relative;
+            color: white;
         }
         
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 60%);
+            inset: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.25) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
         
         .marquee-container {
             position: fixed;
-            top: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            top: 0; left: 0; right: 0;
+            background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(12px);
-            padding: 10px 0;
+            padding: 12px 0;
             z-index: 100;
-            overflow: hidden;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
         }
+        
         .marquee {
             white-space: nowrap;
             display: inline-block;
-            animation: marquee 18s linear infinite;
+            animation: marquee 20s linear infinite;
             padding-left: 100%;
         }
+        
         .marquee a {
             color: #fff;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 0 40px;
-            font-size: 16px;
-            display: inline-block;
-            background: rgba(168, 85, 247, 0.4);
-            border-radius: 30px;
-            margin: 0 8px;
+            font-weight: 600;
+            padding: 6px 28px;
+            background: rgba(236, 72, 153, 0.5);
+            border-radius: 9999px;
+            margin: 0 10px;
+            font-size: 15px;
         }
+        
         @keyframes marquee {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
         
         .glass-modern {
-            background: rgba(15, 12, 41, 0.65);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
         
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .glass-card:hover {
-            border-color: rgba(168, 85, 247, 0.4);
-            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.15);
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
         
         .main-title {
-            font-size: 3.8rem;
-            letter-spacing: -0.03em;
+            font-size: 2.8rem;
+            line-height: 1.05;
         }
         
-        @media (max-width: 768px) {
-            .main-title { font-size: 2.6rem; }
+        @media (min-width: 768px) {
+            .main-title { font-size: 3.8rem; }
         }
         
-        .song-list::-webkit-scrollbar { width: 5px; }
+        .search-input {
+            font-size: 1.05rem;
+            padding: 16px 20px 16px 56px;
+        }
+        
+        .song-item {
+            padding: 16px 20px;
+            transition: all 0.25s ease;
+        }
+        
+        .song-item:active {
+            background: rgba(236, 72, 153, 0.2);
+            transform: scale(0.985);
+        }
+        
+        .song-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        
         .song-list::-webkit-scrollbar-thumb {
             background: rgba(168, 85, 247, 0.6);
             border-radius: 10px;
         }
         
         .loader {
-            width: 36px; height: 36px;
+            width: 32px;
+            height: 32px;
             border: 4px solid rgba(168, 85, 247, 0.3);
             border-top-color: #a855f7;
             border-radius: 50%;
@@ -102,6 +115,10 @@
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        audio {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -113,72 +130,71 @@
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-6xl mx-auto px-4 py-8 main-content">
-        <div class="text-center title-section mb-10">
-            <h1 class="main-title font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-clip-text text-transparent">
+    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 pt-20 pb-12">
+        <!-- 标题 -->
+        <div class="text-center mb-10">
+            <h1 class="main-title font-bold bg-gradient-to-r from-purple-300 via-pink-400 to-purple-300 bg-clip-text text-transparent">
                 ♡｡Eternity.✨音乐网
             </h1>
-            <p class="text-white/60 text-lg mt-2">基于QQ音乐 · 高清无损 · 沉浸聆听</p>
+            <p class="text-white/70 mt-2 text-base">高清无损 · 沉浸聆听</p>
         </div>
-        
-        <!-- 音质选择 + 搜索栏 -->
-        <div class="glass-modern rounded-3xl p-6 md:p-8 mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-white/80 flex items-center gap-2">
-                    <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+
+        <!-- 搜索区域 -->
+        <div class="glass-modern rounded-3xl p-5 md:p-7 mb-8">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2 text-white/80">
+                    <span class="w-2.5 h-2.5 bg-pink-400 rounded-full animate-pulse"></span>
                     音质选择
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 flex-wrap">
                     <button v-for="q in qualities" :key="q.value"
                         @click="currentQuality = q.value; if(currentSong) refreshPlay()"
-                        :class="currentQuality === q.value ? 'quality-btn-active' : 'bg-white/10 hover:bg-white/20'"
-                        class="quality-btn px-6 py-2.5 rounded-2xl font-semibold transition-all text-sm">
+                        :class="currentQuality === q.value ? 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg' : 'bg-white/10 hover:bg-white/20'"
+                        class="px-5 py-2 rounded-2xl text-sm font-medium transition-all">
                         {{ q.label }}
                     </button>
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex flex-col sm:flex-row gap-3">
                 <div class="flex-1 relative">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 text-purple-400 text-xl">🔍</div>
-                    <input v-model="keyword" @keyup.enter="searchMusic" type="text"
-                        placeholder="输入歌名、歌手，如「晴天」「周杰伦」「稻香」..."
-                        class="search-input w-full pl-14 pr-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-purple-500 outline-none text-base">
+                    <input v-model="keyword" @keyup.enter="searchMusic"
+                        placeholder="歌名 / 歌手 / 如 晴天 周杰伦"
+                        class="search-input w-full bg-white/10 border border-white/20 rounded-3xl text-white placeholder-white/60 focus:border-purple-400 outline-none">
                 </div>
                 <button @click="searchMusic" :disabled="loading"
-                    class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-10 py-4 rounded-2xl font-semibold flex items-center gap-3 min-w-[140px] justify-center shadow-lg">
+                    class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-8 py-4 rounded-3xl font-semibold flex items-center justify-center gap-2 min-w-[120px]">
                     <span v-if="loading" class="loader"></span>
-                    <span>{{ loading ? '搜索中...' : '🎵 搜索音乐' }}</span>
+                    <span>{{ loading ? '搜索中...' : '搜索音乐' }}</span>
                 </button>
             </div>
 
-            <div class="flex flex-wrap gap-3 mt-6">
-                <span v-for="tag in quickTags" :key="tag" 
+            <div class="flex flex-wrap gap-2 mt-6">
+                <span v-for="tag in quickTags" :key="tag"
                     @click="keyword = tag; searchMusic()"
-                    class="quick-tag px-5 py-2 rounded-2xl bg-white/10 hover:bg-purple-500/30 cursor-pointer transition-all">
+                    class="px-5 py-2.5 bg-white/10 hover:bg-purple-500/30 rounded-3xl text-sm cursor-pointer transition-all active:scale-95">
                     🎧 {{ tag }}
                 </span>
             </div>
         </div>
 
         <!-- 正在播放 -->
-        <div v-if="currentSong" class="glass-card rounded-3xl p-7 mb-8">
-            <div class="flex flex-col md:flex-row items-center gap-8">
-                <div class="relative flex-shrink-0">
-                    <img :src="currentSong.cover" class="w-40 h-40 rounded-2xl shadow-2xl object-cover rotate-slow"
+        <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-6 items-center">
+                <div class="relative">
+                    <img :src="currentSong.cover" class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover shadow-xl"
                          @error="currentSong.cover = defaultCover">
-                    <div class="absolute -bottom-3 -right-3 w-10 h-10 bg-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
-                        🎵
-                    </div>
+                    <div class="absolute -bottom-2 -right-2 bg-purple-600 text-white w-9 h-9 rounded-2xl flex items-center justify-center text-xl shadow">♪</div>
                 </div>
-                <div class="flex-1 text-center md:text-left">
-                    <span class="inline-block px-4 py-1 bg-purple-500/30 text-purple-200 rounded-full text-sm mb-3">正在播放</span>
-                    <h2 class="text-3xl font-bold text-white mb-2">{{ currentSong.name }}</h2>
-                    <p class="text-white/70 text-xl">{{ currentSong.artist }}</p>
-                    <audio :src="currentPlayUrl" controls autoplay class="w-full mt-6 rounded-xl" @error="onPlayError"></audio>
-                    <div v-if="playError" class="mt-4 text-amber-300 flex items-center gap-2 justify-center md:justify-start">
-                        ⚠️ {{ playError }}
-                        <button @click="refreshPlay" class="underline text-purple-300">重试</button>
+                <div class="flex-1 text-center sm:text-left w-full">
+                    <div class="inline-block px-4 py-1 bg-purple-500/30 text-purple-200 rounded-full text-xs mb-3">正在播放</div>
+                    <h2 class="text-2xl font-semibold leading-tight mb-1">{{ currentSong.name }}</h2>
+                    <p class="text-white/70">{{ currentSong.artist }}</p>
+                    <audio :src="currentPlayUrl" controls autoplay class="mt-6" @error="onPlayError"></audio>
+                    <div v-if="playError" class="mt-3 text-amber-300 text-sm flex items-center justify-center sm:justify-start gap-2">
+                        ⚠️ {{ playError }} 
+                        <button @click="refreshPlay" class="underline">重试</button>
                     </div>
                 </div>
             </div>
@@ -186,34 +202,33 @@
 
         <!-- 搜索结果 -->
         <div class="glass-modern rounded-3xl overflow-hidden">
-            <div class="px-7 py-6 border-b border-white/10 flex justify-between items-center">
+            <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="text-3xl">🎧</span>
-                    <span class="text-white font-semibold text-2xl">搜索结果</span>
-                    <span v-if="songs.length" class="ml-3 px-4 py-1 bg-purple-500/30 text-purple-200 rounded-full text-sm">{{ songs.length }} 首</span>
+                    <span class="text-2xl">🎧</span>
+                    <span class="font-semibold text-xl">搜索结果</span>
+                    <span v-if="songs.length" class="ml-2 px-3 py-0.5 bg-purple-500/30 rounded-full text-sm">{{ songs.length }}首</span>
                 </div>
-                <div v-if="songs.length" class="text-white/60">点击歌曲播放</div>
+                <div v-if="songs.length" class="text-white/60 text-sm">点击即可播放</div>
             </div>
 
-            <div v-if="loading && !songs.length" class="p-20 text-center">
-                <div class="loader mx-auto mb-6"></div>
-                <p class="text-white/60">正在搜索音乐...</p>
+            <div v-if="loading && !songs.length" class="py-20 text-center">
+                <div class="loader mx-auto mb-4"></div>
+                <p class="text-white/70">正在寻找好听的歌...</p>
             </div>
 
-            <div v-else-if="!songs.length && !loading" class="p-20 text-center">
-                <div class="text-8xl mb-6 opacity-40">🎼</div>
-                <p class="text-white/60 text-xl">输入关键词开始聆听</p>
-                <p class="text-white/40 mt-3">试试「晴天」「稻香」「夜曲」</p>
+            <div v-else-if="!songs.length && !loading" class="py-20 text-center">
+                <div class="text-6xl mb-4 opacity-50">🎵</div>
+                <p class="text-white/70">输入关键词开始你的音乐之旅</p>
             </div>
 
-            <div v-else class="divide-y divide-white/10 max-h-[520px] overflow-y-auto song-list">
-                <div v-for="(song, idx) in songs" :key="song.id" 
+            <div v-else class="max-h-[520px] overflow-y-auto song-list divide-y divide-white/10">
+                <div v-for="(song, i) in songs" :key="song.id"
                      @click="playSong(song)"
-                     class="song-item p-5 flex items-center gap-5 cursor-pointer hover:bg-white/5">
-                    <div class="w-8 text-white/50 font-mono">{{ String(idx+1).padStart(2, '0') }}</div>
-                    <img :src="song.cover" class="w-14 h-14 rounded-xl object-cover" @error="song.cover = defaultCover">
+                     class="song-item flex items-center gap-4 active:bg-white/10">
+                    <div class="w-8 text-white/50 font-mono text-base">{{ (i+1).toString().padStart(2, '0') }}</div>
+                    <img :src="song.cover" class="w-14 h-14 rounded-xl object-cover flex-shrink-0" @error="song.cover = defaultCover">
                     <div class="flex-1 min-w-0">
-                        <div class="text-white font-semibold truncate">{{ song.name }}</div>
+                        <div class="font-medium truncate">{{ song.name }}</div>
                         <div class="text-white/60 text-sm truncate">{{ song.artist }}</div>
                     </div>
                     <div class="text-white/50 text-sm hidden sm:block">{{ song.duration }}</div>
@@ -221,7 +236,7 @@
             </div>
         </div>
 
-        <div class="text-center mt-10 text-white/30 text-sm">
+        <div class="text-center mt-10 text-white/40 text-sm">
             ♡｡Eternity.✨音乐网 · 用心聆听每一刻
         </div>
     </div>
@@ -229,20 +244,23 @@
     <script>
         const { createApp, ref } = Vue;
 
-        // GitHub Pages 推荐 CORS 代理（2026年较稳定）
         const PROXY = 'https://corsproxy.io/?';
 
         const proxyPost = async (url, data) => {
-            const fullUrl = PROXY + encodeURIComponent(url);
-            const response = await axios.post(fullUrl, data, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'Content-Type': 'application/json',
-                    'Referer': 'https://y.qq.com'
-                },
-                timeout: 12000
-            });
-            return response.data;
+            try {
+                const fullUrl = PROXY + encodeURIComponent(url);
+                const res = await axios.post(fullUrl, data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'Mozilla/5.0'
+                    },
+                    timeout: 15000
+                });
+                return res.data;
+            } catch (e) {
+                console.error('Proxy error:', e);
+                throw e;
+            }
         };
 
         createApp({
@@ -253,7 +271,6 @@
                 const currentSong = ref(null);
                 const currentPlayUrl = ref('');
                 const playError = ref('');
-                const message = ref('');
                 const currentQuality = ref('128k');
 
                 const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
@@ -265,13 +282,15 @@
                 const quickTags = ['晴天', '稻香', '夜曲', '七里香', '告白气球', '海阔天空', '起风了', '孤勇者'];
 
                 const showMsg = (msg) => {
-                    message.value = msg;
-                    setTimeout(() => message.value = '', 2500);
+                    // 可以后续加个toast，这里先用alert简化
+                    alert(msg);
                 };
 
                 const searchMusic = async () => {
-                    if (!keyword.value.trim()) return showMsg('请输入歌名或歌手');
-                    
+                    if (!keyword.value.trim()) {
+                        showMsg('请输入歌名或歌手哦~');
+                        return;
+                    }
                     loading.value = true;
                     songs.value = [];
 
@@ -285,22 +304,18 @@
                         };
 
                         const data = await proxyPost('https://u.y.qq.com/cgi-bin/musicu.fcg', postData);
+                        const list = data?.req_1?.data?.body?.song?.list || [];
 
-                        const songList = data?.req_1?.data?.body?.song?.list || [];
+                        songs.value = list.map(item => ({
+                            id: item.id,
+                            mid: item.mid,
+                            name: item.name,
+                            artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
+                            cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover,
+                            duration: item.interval ? `${Math.floor(item.interval/60)}:${(item.interval % 60).toString().padStart(2,'0')}` : '03:30'
+                        }));
 
-                        songs.value = songList.map(item => {
-                            const albumMid = item.album?.mid;
-                            return {
-                                id: item.id,
-                                mid: item.mid,
-                                name: item.name,
-                                artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
-                                cover: albumMid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${albumMid}.jpg` : defaultCover,
-                                duration: item.interval ? `${Math.floor(item.interval/60)}:${(item.interval%60).toString().padStart(2,'0')}` : '03:30'
-                            };
-                        });
-
-                        showMsg(songs.value.length ? `找到 ${songs.value.length} 首歌曲` : '未找到相关歌曲，换个关键词试试');
+                        if (songs.value.length === 0) showMsg('没找到相关歌曲，换个关键词试试吧');
                     } catch (err) {
                         console.error(err);
                         showMsg('搜索失败，请稍后再试');
@@ -309,10 +324,9 @@
                     }
                 };
 
-                const getPlayUrl = (songmid) => {
-                    const qualityMap = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
-                    const level = qualityMap[currentQuality.value];
-                    return `https://music.nxinxz.com/kgqq/tx.php?id=${songmid}&level=${level}&type=mp3`;
+                const getPlayUrl = (mid) => {
+                    const map = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
+                    return `https://music.nxinxz.com/kgqq/tx.php?id=${mid}&level=${map[currentQuality.value]}&type=mp3`;
                 };
 
                 const getNeteaseUrl = (name) => {
@@ -336,18 +350,19 @@
                     if (!url) url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
                     currentPlayUrl.value = url;
-                    showMsg(`正在播放：${song.name}`);
                 };
 
-                const refreshPlay = () => currentSong.value && playSong(currentSong.value);
+                const refreshPlay = () => {
+                    if (currentSong.value) playSong(currentSong.value);
+                };
 
                 const onPlayError = () => {
-                    playError.value = '播放失败，建议切换音质或重试';
+                    playError.value = '播放失败，建议切换音质重试';
                 };
 
                 return {
-                    keyword, songs, loading, currentSong, currentPlayUrl, playError,
-                    currentQuality, qualities, defaultCover, quickTags,
+                    keyword, songs, loading, currentSong, currentPlayUrl, playError, currentQuality,
+                    qualities, defaultCover, quickTags,
                     searchMusic, playSong, refreshPlay, onPlayError
                 };
             }
