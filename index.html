@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>♡｡Eternity.✨Music</title>
+    <title>♡｡Eternity.✨音乐</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -16,7 +16,7 @@
             position: relative;
             overflow: hidden;
         }
-        /* Rain Effect */
+        /* 雨滴效果 */
         .rain {
             position: fixed;
             top: 0;
@@ -154,36 +154,36 @@
     </style>
 </head>
 <body>
-    <!-- Rain Container -->
+    <!-- 雨滴容器 -->
     <div class="rain" id="rain"></div>
 
     <div class="marquee-container">
         <div class="marquee">
-            <span>Those who offend China shall be punished even if they are far away!</span>
-            <span>Those who offend China shall be punished even if they are far away!</span>
-            <span>Those who offend China shall be punished even if they are far away!</span>
+            <span>犯我中华者，虽远必诛！</span>
+            <span>犯我中华者，虽远必诛！</span>
+            <span>犯我中华者，虽远必诛！</span>
         </div>
     </div>
 
     <div id="app" class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-8 main-content">
         <div class="text-center title-section mb-8">
-            <h1 class="main-title font-bold tracking-tighter">♡｡Eternity.✨Music</h1>
-            <p class="text-sky-200/80 mt-2 text-lg">Eternal Galaxy · Immersive Listening · SVIP Source</p>
+            <h1 class="main-title font-bold tracking-tighter">♡｡Eternity.✨音乐</h1>
+            <p class="text-sky-200/80 mt-2 text-lg">永恒星河 · 沉浸聆听 · SVIP音源</p>
         </div>
         
-        <!-- Search Area -->
+        <!-- 搜索区域 -->
         <div class="glass-modern rounded-3xl p-7 mb-8">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1 relative">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 text-sky-400 text-2xl">🔍</div>
                     <input v-model="keyword" @keyup.enter="searchMusic" type="text" 
-                        placeholder="Search song / artist / album..." 
+                        placeholder="搜索歌名 / 歌手 / 专辑..." 
                         class="w-full pl-14 pr-6 py-4 rounded-2xl bg-white/10 border border-sky-400/30 text-white placeholder-sky-200/50 outline-none focus:border-sky-400 text-lg transition-all">
                 </div>
                 <button @click="searchMusic" :disabled="loading"
                     class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white px-10 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3 min-w-[160px] shadow-xl disabled:opacity-70">
                     <span v-if="loading" class="loader"></span>
-                    <span v-else>Search Music</span>
+                    <span v-else>搜索音乐</span>
                 </button>
             </div>
             
@@ -195,24 +195,24 @@
             </div>
         </div>
 
-        <!-- Now Playing -->
+        <!-- 当前播放 -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-8 mb-8">
             <div class="flex flex-col lg:flex-row gap-8 items-center">
-                <!-- Cover -->
+                <!-- 封面 -->
                 <div class="relative flex-shrink-0">
                     <img :src="currentSong.artwork" class="w-52 h-52 rounded-2xl shadow-2xl object-cover" 
                          @error="currentSong.artwork = defaultCover">
                     <div class="absolute -top-3 -right-3 bg-gradient-to-br from-sky-400 to-blue-500 text-white text-xs font-bold px-4 py-1 rounded-2xl shadow-lg">SVIP</div>
                 </div>
                 
-                <!-- Song Info + Player -->
+                <!-- 歌曲信息 + 播放器 -->
                 <div class="flex-1 w-full">
                     <div class="text-center lg:text-left">
                         <h2 class="now-playing-title font-semibold text-white leading-tight mb-1">{{ currentSong.title }}</h2>
                         <p class="text-sky-200/80 text-xl">{{ currentSong.artist }}</p>
                     </div>
                     
-                    <!-- Lyrics -->
+                    <!-- 滚动歌词 -->
                     <div class="lyrics mt-6 text-center text-sky-100/90 text-lg font-light" id="lyricsContainer">
                         <div v-for="(line, i) in lyrics" :key="i" 
                              class="lyrics-line py-1" 
@@ -221,7 +221,7 @@
                         </div>
                     </div>
                     
-                    <!-- Controls -->
+                    <!-- 播放控制 -->
                     <div class="flex items-center justify-center gap-6 mt-6">
                         <button @click="prevSong" class="control-btn text-sky-300 text-3xl">⫷</button>
                         <button @click="togglePlay" 
@@ -234,33 +234,33 @@
                     <audio ref="audioPlayer" :src="currentPlayUrl" @timeupdate="updateLyric" @ended="nextSong" 
                            class="hidden"></audio>
                     
-                    <!-- Download -->
+                    <!-- 下载按钮 -->
                     <div class="flex justify-center mt-8">
                         <button @click="downloadSong" :disabled="downloading"
                             class="flex items-center gap-3 px-10 py-3.5 rounded-2xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-xl">
                             <span v-if="downloading" class="loader w-5 h-5"></span>
-                            <span v-else>⬇️ Download</span>
+                            <span v-else>⬇️ 下载这首歌</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Playlist -->
+        <!-- 播放列表 -->
         <div class="glass-modern rounded-3xl overflow-hidden">
             <div class="px-8 py-6 border-b border-sky-400/20 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <span class="text-3xl">📜</span>
-                    <span class="text-2xl font-semibold text-white">Playlist</span>
-                    <span v-if="playlist.length" class="ml-3 px-4 py-1 text-sm bg-sky-500/30 text-sky-200 rounded-full">{{ playlist.length }} songs</span>
+                    <span class="text-2xl font-semibold text-white">播放列表</span>
+                    <span v-if="playlist.length" class="ml-3 px-4 py-1 text-sm bg-sky-500/30 text-sky-200 rounded-full">{{ playlist.length }} 首</span>
                 </div>
-                <div class="text-sky-300/70 text-sm">Click to play</div>
+                <div class="text-sky-300/70 text-sm">点击歌曲播放</div>
             </div>
             
             <div v-if="playlist.length === 0" class="p-20 text-center">
                 <div class="text-8xl opacity-40 mb-6">♪</div>
-                <p class="text-sky-200/60 text-xl">Playlist is empty</p>
-                <p class="text-sky-200/40 mt-2">Search and add songs</p>
+                <p class="text-sky-200/60 text-xl">播放列表为空</p>
+                <p class="text-sky-200/40 mt-2">搜索音乐后点击歌曲即可加入</p>
             </div>
             
             <div v-else class="divide-y divide-sky-400/10 max-h-[520px] overflow-y-auto song-list">
@@ -280,7 +280,7 @@
         </div>
         
         <div class="text-center mt-10 text-sky-300/40 text-sm tracking-widest">
-            ♡｡Eternity.✨Music · Eternal Notes · For Every Listener
+            ♡｡Eternity.✨音乐 · 永恒的音符 · 献给每一位听者
         </div>
     </div>
 
@@ -289,19 +289,19 @@
         
         const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R800x800M000003e5R7I3E8B3Z.jpg';
         
-        // Built-in Playlist (SVIP Source)
+        // 内置播放列表（SVIP音源）
         const builtInPlaylist = [
-            { id: 1, title: "爱如星火", artist: "Unknown Artist", url: "https://files.catbox.moe/d5bklp.flac", artwork: "https://picsum.photos/id/1015/300/300", duration: "04:12" },
-            { id: 2, title: "那一年那一天", artist: "Unknown Artist", url: "https://files.catbox.moe/fawyem.flac", artwork: "https://picsum.photos/id/102/300/300", duration: "05:05" },
-            { id: 3, title: "平凡之路", artist: "Unknown Artist", url: "https://files.catbox.moe/89l1hc.flac", artwork: "https://picsum.photos/id/103/300/300", duration: "04:58" },
-            { id: 4, title: "相濡以沫", artist: "Unknown Artist", url: "https://files.catbox.moe/0oluxu.flac", artwork: "https://picsum.photos/id/104/300/300", duration: "03:47" },
-            { id: 5, title: "不会改变", artist: "Unknown Artist", url: "https://files.catbox.moe/zsgxyr.flac", artwork: "https://picsum.photos/id/106/300/300", duration: "04:33" },
-            { id: 6, title: "朋克万岁", artist: "Unknown Artist", url: "https://files.catbox.moe/k2vbz2.flac", artwork: "https://picsum.photos/id/107/300/300", duration: "03:29" },
-            { id: 7, title: "500公里", artist: "Unknown Artist", url: "https://files.catbox.moe/gjyhqw.flac", artwork: "https://picsum.photos/id/108/300/300", duration: "04:51" },
-            { id: 8, title: "罪人", artist: "Unknown Artist", url: "https://files.catbox.moe/9p209l.flac", artwork: "https://picsum.photos/id/109/300/300", duration: "05:22" },
-            { id: 9, title: "曾经的你", artist: "Unknown Artist", url: "https://files.catbox.moe/6nm44r.flac", artwork: "https://picsum.photos/id/110/300/300", duration: "04:40" },
-            { id: 10, title: "空位", artist: "Unknown Artist", url: "https://streamshare.wireway.ch/download/yt5oyld9", artwork: "https://picsum.photos/id/111/300/300", duration: "03:55" },
-            { id: 11, title: "嘎嘎", artist: "Unknown Artist", url: "https://files.catbox.moe/yjarpu.flac", artwork: "https://picsum.photos/id/112/300/300", duration: "04:18" }
+            { id: 1, title: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", artwork: "https://picsum.photos/id/1015/300/300", duration: "04:12" },
+            { id: 2, title: "那一年那一天", artist: "未知歌手", url: "https://files.catbox.moe/fawyem.flac", artwork: "https://picsum.photos/id/102/300/300", duration: "05:05" },
+            { id: 3, title: "平凡之路", artist: "未知歌手", url: "https://files.catbox.moe/89l1hc.flac", artwork: "https://picsum.photos/id/103/300/300", duration: "04:58" },
+            { id: 4, title: "相濡以沫", artist: "未知歌手", url: "https://files.catbox.moe/0oluxu.flac", artwork: "https://picsum.photos/id/104/300/300", duration: "03:47" },
+            { id: 5, title: "不会改变", artist: "未知歌手", url: "https://files.catbox.moe/zsgxyr.flac", artwork: "https://picsum.photos/id/106/300/300", duration: "04:33" },
+            { id: 6, title: "朋克万岁", artist: "未知歌手", url: "https://files.catbox.moe/k2vbz2.flac", artwork: "https://picsum.photos/id/107/300/300", duration: "03:29" },
+            { id: 7, title: "500公里", artist: "未知歌手", url: "https://files.catbox.moe/gjyhqw.flac", artwork: "https://picsum.photos/id/108/300/300", duration: "04:51" },
+            { id: 8, title: "罪人", artist: "未知歌手", url: "https://files.catbox.moe/9p209l.flac", artwork: "https://picsum.photos/id/109/300/300", duration: "05:22" },
+            { id: 9, title: "曾经的你", artist: "未知歌手", url: "https://files.catbox.moe/6nm44r.flac", artwork: "https://picsum.photos/id/110/300/300", duration: "04:40" },
+            { id: 10, title: "空位", artist: "未知歌手", url: "https://streamshare.wireway.ch/download/yt5oyld9", artwork: "https://picsum.photos/id/111/300/300", duration: "03:55" },
+            { id: 11, title: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", artwork: "https://picsum.photos/id/112/300/300", duration: "04:18" }
         ];
 
         createApp({
@@ -314,17 +314,17 @@
                 const downloading = ref(false);
                 const currentLyricIndex = ref(0);
                 const lyrics = ref([
-                    "May this song accompany you through the endless galaxy",
-                    "Find yourself in the melody of eternity",
+                    "愿这首歌陪你走过漫长星河",
+                    "在永恒的旋律里找到自己",
                     "♡｡Eternity.✨",
-                    "Music is the language of the soul"
+                    "音乐是灵魂的语言"
                 ]);
                 
-                const quickTags = ['Sunny Day', 'Rice Fragrance', 'Night Song', 'Seven Miles of Fragrance', 'Confession Balloon', 'Ordinary Road'];
+                const quickTags = ['晴天', '稻香', '夜曲', '七里香', '告白气球', '平凡之路'];
                 
                 const audioPlayer = ref(null);
                 
-                // Create Rain Effect
+                // 创建雨滴
                 const createRain = () => {
                     const rainContainer = document.getElementById('rain');
                     for (let i = 0; i < 120; i++) {
@@ -396,7 +396,7 @@
                         a.click();
                         URL.revokeObjectURL(blobUrl);
                     } catch (e) {
-                        alert('Download failed, please right-click and save the link');
+                        alert('下载失败，请直接右键保存链接');
                     } finally {
                         downloading.value = false;
                     }
@@ -404,7 +404,7 @@
                 
                 const searchMusic = () => {
                     if (!keyword.value.trim()) return;
-                    alert(`Search mode: ${keyword.value}\n\n(Current version uses built-in playlist)`);
+                    alert(`搜索模式：${keyword.value}\n\n（当前版本以内置播放列表为主）`);
                 };
                 
                 onMounted(() => {
