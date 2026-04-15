@@ -17,6 +17,7 @@
             overflow-x: hidden;
         }
 
+        /* 雪花 */
         .snowflake {
             position: absolute;
             top: -25px;
@@ -29,6 +30,7 @@
         }
         @keyframes snowfall { to { transform: translateY(115vh); } }
 
+        /* 跑马灯 */
         .marquee-container {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -99,15 +101,15 @@
             </button>
         </div>
 
-        <!-- 搜索栏（已严格对齐 + 按钮内收） -->
+        <!-- 搜索栏（进一步缩小，对齐SVIP按钮） -->
         <div class="glass rounded-3xl p-5 mb-6">
             <div class="flex gap-2">
                 <input v-model="keyword" @keyup.enter="searchMusic"
                        type="text" placeholder="输入歌名或歌手"
-                       class="flex-1 bg-white/10 border border-white/30 rounded-2xl px-5 py-3.5 text-white placeholder-pink-200 outline-none text-base">
+                       class="flex-1 bg-white/10 border border-white/30 rounded-2xl px-5 py-3 text-white placeholder-pink-200 outline-none text-base">
 
                 <button @click="searchMusic" :disabled="loading"
-                        class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3.5 rounded-2xl text-white font-medium whitespace-nowrap min-w-[68px]">
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-3 rounded-2xl text-white font-medium text-sm whitespace-nowrap">
                     <span v-if="loading">搜索中</span>
                     <span v-else>搜索</span>
                 </button>
@@ -136,7 +138,7 @@
                     class="flex-1 py-3 rounded-3xl text-base">二宝子歌单</button>
         </div>
 
-        <!-- 可滑动内容 -->
+        <!-- 可滑动内容区域 -->
         <div class="glass rounded-3xl overflow-hidden">
             <div v-if="activeTab === 'search'" class="scroll-area">
                 <div class="px-5 py-3 border-b border-white/10 text-xs text-purple-200">搜索结果</div>
