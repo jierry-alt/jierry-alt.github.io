@@ -47,30 +47,15 @@
             color: #e0d4ff;
             font-size: 1.15rem;
         }
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        .glass-modern {
-            background: rgba(15, 12, 41, 0.75);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(167, 139, 250, 0.25);
-        }
+        .glass-modern { background: rgba(15, 12, 41, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(167, 139, 250, 0.25); }
+        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); border: 1px solid rgba(167, 139, 250, 0.2); }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(167, 139, 250, 0.2);
-        }
-
-        .song-item:hover {
-            background: linear-gradient(90deg, rgba(129, 140, 248, 0.3), rgba(167, 139, 250, 0.2));
-            transform: translateX(6px);
-        }
+        .song-item:hover { background: linear-gradient(90deg, rgba(129, 140, 248, 0.3), rgba(167, 139, 250, 0.2)); transform: translateX(6px); }
 
         .main-title {
-            font-size: 2.6rem;
+            font-size: 2.65rem;
             font-weight: 800;
             letter-spacing: -0.03em;
             background: linear-gradient(90deg, #c4b5fd, #e0d4ff, #a5b4fc);
@@ -79,15 +64,12 @@
             background-clip: text;
         }
 
-        @media (max-width: 640px) {
-            .main-title {
-                font-size: 2.35rem;
-            }
-        }
+        @media (max-width: 640px) { .main-title { font-size: 2.4rem; } }
 
         .quality-btn {
             transition: all 0.3s ease;
-            min-width: 110px;
+            min-width: 105px;
+            padding: 12px 20px;
         }
         .quality-btn-active {
             background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
@@ -109,12 +91,11 @@
 
     <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 pt-20 pb-8">
 
-        <!-- 标题 + 音质切换 -->
+        <!-- 标题 + 音质切换（三个按钮全部保留） -->
         <div class="text-center mb-10">
-            <h1 class="main-title">
-                ♡｡Eternity.✨音乐
-            </h1>
+            <h1 class="main-title">♡｡Eternity.✨音乐</h1>
 
+            <!-- 音质按钮：标准 / 高品质 / 无损 -->
             <div class="flex justify-center gap-3 mt-8 flex-wrap">
                 <button v-for="q in qualities" :key="q.value"
                     @click="currentQuality = q.value"
@@ -131,7 +112,7 @@
                 <div class="flex-1 relative">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-400 text-2xl">🔍</div>
                     <input v-model="keyword" @keyup.enter="searchMusic" 
-                        placeholder="搜索歌名、歌手... 如：晴天、周杰伦、那一年那一天" 
+                        placeholder="搜索歌名、歌手... 如：晴天、周杰伦" 
                         class="w-full pl-14 pr-6 py-4 bg-white/10 border border-white/30 rounded-2xl text-white placeholder-white/60 focus:border-violet-400 outline-none text-base">
                 </div>
                 <button @click="searchMusic" :disabled="loading"
@@ -148,13 +129,11 @@
                 <div class="relative flex-shrink-0">
                     <img :src="currentSong.cover" class="w-36 h-36 md:w-44 md:h-44 rounded-2xl shadow-2xl object-cover" @error="currentSong.cover = defaultCover">
                 </div>
-
                 <div class="flex-1 w-full">
                     <div class="text-center md:text-left">
                         <h2 class="text-2xl font-bold mb-1">{{ currentSong.name }}</h2>
                         <p class="text-white/75">{{ currentSong.artist }}</p>
                     </div>
-
                     <div class="flex items-center justify-center md:justify-start gap-8 mt-8">
                         <button @click="prevSong" class="text-4xl hover:scale-110 transition">⏮</button>
                         <button @click="togglePlay" 
@@ -168,7 +147,7 @@
             <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
         </div>
 
-        <!-- 播放列表 -->
+        <!-- 播放列表（你的11首歌曲全部保留） -->
         <div class="glass-modern rounded-3xl overflow-hidden mb-8">
             <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/30">
                 <div class="flex items-center gap-3">
@@ -177,7 +156,6 @@
                 </div>
                 <button @click="clearPlaylist" class="text-white/60 hover:text-red-400 text-sm">清空</button>
             </div>
-
             <div class="max-h-[420px] overflow-y-auto divide-y divide-white/10">
                 <div v-for="(song, idx) in playlist" :key="song.id + idx"
                      @click="playFromPlaylist(idx)"
@@ -208,7 +186,7 @@
             </div>
 
             <div v-else-if="!songs.length && !loading" class="p-20 text-center text-white/50">
-                输入关键词开始搜索（例如：晴天、周杰伦）
+                输入关键词开始搜索
             </div>
 
             <div v-else class="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
@@ -223,7 +201,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -240,7 +217,7 @@
                 const playlist = ref([]);
                 const currentIndex = ref(-1);
                 const isPlaying = ref(false);
-                const currentQuality = ref('flac');
+                const currentQuality = ref('flac');   // 默认无损
 
                 const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
 
@@ -250,7 +227,7 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的11首上传歌曲（全部保留）
+                // 你的11首上传歌曲全部保留
                 const specialPlaylist = [
                     { id: 1001, name: "嘎嘎", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/yjarpu.flac" },
                     { id: 1002, name: "爱如星火", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/d5bklp.flac" },
@@ -266,20 +243,14 @@
                 ];
 
                 playlist.value = [...specialPlaylist];
-                if (playlist.value.length > 0) {
-                    setTimeout(() => playSong(0), 300);
-                }
+                if (playlist.value.length > 0) setTimeout(() => playSong(0), 300);
 
                 const searchMusic = async () => {
-                    if (!keyword.value.trim()) {
-                        alert('请输入歌名或歌手');
-                        return;
-                    }
+                    if (!keyword.value.trim()) return alert('请输入歌名或歌手');
                     loading.value = true;
                     songs.value = [];
 
                     try {
-                        const timestamp = Date.now();
                         const postData = {
                             comm: { ct: 24, cv: 0 },
                             req_1: {
@@ -290,7 +261,7 @@
                                     num_per_page: 20,
                                     page_num: 1,
                                     search_type: 0,
-                                    t: timestamp
+                                    remoteplace: "txt.yqq.top"
                                 }
                             }
                         };
@@ -298,15 +269,13 @@
                         const res = await axios.post(PROXY + 'https://u.y.qq.com/cgi-bin/musicu.fcg', postData, {
                             headers: {
                                 'Referer': 'https://y.qq.com',
-                                'Origin': 'https://y.qq.com'
+                                'Origin': 'https://y.qq.com',
+                                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15'
                             }
                         });
 
                         const songList = res.data?.req_1?.data?.body?.song?.list || [];
-                        
-                        if (songList.length === 0) {
-                            alert('未找到相关歌曲，试试其他关键词');
-                        }
+                        if (songList.length === 0) alert('未找到歌曲，试试其他关键词');
 
                         songs.value = songList.map(item => ({
                             id: item.id,
@@ -317,14 +286,14 @@
                         }));
                     } catch (e) {
                         console.error(e);
-                        alert('搜索失败，可能网络或接口问题，请稍后再试');
+                        alert('搜索失败，可能网络或代理问题，请稍后重试');
                     } finally {
                         loading.value = false;
                     }
                 };
 
                 const getPlayUrl = (song) => {
-                    if (song.url) return song.url;   // 你的上传歌曲
+                    if (song.url) return song.url;
                     if (!song.mid) return null;
                     const levelMap = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
                     return `https://music.nxinxz.com/kgqq/tx.php?id=${song.mid}&level=${levelMap[currentQuality.value]}&type=mp3`;
@@ -339,8 +308,7 @@
                     const audio = document.querySelector('audio');
                     if (audio) {
                         audio.src = currentPlayUrl.value;
-                        audio.play().catch(() => { isPlaying.value = false; });
-                        isPlaying.value = true;
+                        audio.play().then(() => isPlaying.value = true).catch(() => {});
                     }
                 };
 
@@ -369,12 +337,10 @@
                 };
 
                 const playFromPlaylist = (index) => playSong(index);
-
                 const removeFromPlaylist = (index) => {
                     if (index === currentIndex.value) nextSong();
                     playlist.value.splice(index, 1);
                 };
-
                 const clearPlaylist = () => {
                     if (confirm('确定清空播放列表吗？')) {
                         playlist.value = [];
@@ -382,9 +348,8 @@
                         isPlaying.value = false;
                     }
                 };
-
                 const onPlayError = () => {
-                    alert('播放链接失效，已跳到下一首');
+                    alert('播放失败，已自动跳到下一首');
                     nextSong();
                 };
 
@@ -392,8 +357,7 @@
                     keyword, songs, loading, currentSong, currentPlayUrl, playlist, isPlaying,
                     currentQuality, qualities,
                     searchMusic, togglePlay, nextSong, prevSong,
-                    addToPlaylistAndPlay, playFromPlaylist, removeFromPlaylist, clearPlaylist,
-                    onPlayError
+                    addToPlaylistAndPlay, playFromPlaylist, removeFromPlaylist, clearPlaylist, onPlayError
                 };
             }
         }).mount('#app');
