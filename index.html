@@ -99,7 +99,7 @@
             </button>
         </div>
 
-        <!-- 简单播放器（已改回原版风格 + 下一曲按钮） -->
+        <!-- 简单播放器（已改回原版 + 自动下一首） -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 playing">
             <div class="flex flex-col items-center">
                 <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white mb-6"
@@ -109,11 +109,13 @@
                     <h2 class="text-2xl font-semibold text-gray-800 mb-1">{{ currentSong.name }}</h2>
                     <p class="text-gray-600 mb-6">{{ currentSong.artist }}</p>
 
-                    <audio :src="currentPlayUrl" controls class="w-full mb-4" @error="playError = '播放失败，尝试下一首'" @ended="playNext"></audio>
+                    <audio :src="currentPlayUrl" controls autoplay class="w-full mb-4" 
+                           @error="playError = '播放失败，尝试下一首'" 
+                           @ended="playNext"></audio>
 
                     <div class="flex justify-center gap-8">
                         <button @click="playPrev" class="text-3xl text-gray-600 hover:text-purple-600">⏮</button>
-                        <button @click="playNext" class="text-3xl text-purple-600 hover:scale-110 transition">下一曲 ⏭</button>
+                        <button @click="playNext" class="text-3xl text-purple-600 hover:scale-110 transition">⏭</button>
                     </div>
                 </div>
             </div>
@@ -137,7 +139,7 @@
             </div>
         </div>
 
-        <!-- 你的11首上传歌曲（保留且可播放） -->
+        <!-- 你的11首上传歌曲 -->
         <div class="glass-modern rounded-3xl overflow-hidden">
             <div class="px-6 py-4 border-b bg-white/70">
                 <span class="font-semibold text-lg">推荐歌曲（你的上传）</span>
@@ -162,7 +164,7 @@
     <script>
         const { createApp, ref } = Vue;
 
-        const PROXY = 'https://corsproxy.io/?';   // 当前较稳定代理
+        const PROXY = 'https://corsproxy.io/?';
 
         createApp({
             setup() {
@@ -182,7 +184,7 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的11首上传歌曲（直链，可直接播放）
+                // 你的11首上传歌曲
                 const recommendedSongs = ref([
                     { name: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", cover: defaultCover },
                     { name: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", cover: defaultCover },
@@ -227,7 +229,6 @@
 
                 const playSong = (song) => {
                     currentSong.value = song;
-                    // 优先使用你上传的直链，其次用QQ代理
                     currentPlayUrl.value = song.url || (song.mid ? getPlayUrl(song.mid) : null);
                 };
 
