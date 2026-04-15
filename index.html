@@ -31,7 +31,7 @@
         .marquee-container {
             position: fixed;
             top: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(12px);
             padding: 12px 0;
             z-index: 100;
@@ -45,6 +45,7 @@
             padding-left: 100%;
             font-weight: bold;
             color: #c4b5fd;
+            font-size: 1.1rem;
         }
         @keyframes marquee {
             0% { transform: translateX(0); }
@@ -68,19 +69,14 @@
             transform: translateX(6px);
         }
 
-        .song-playing {
-            background: linear-gradient(90deg, rgba(129, 140, 248, 0.35), rgba(167, 139, 250, 0.2));
-            border-left: 4px solid #a5b4fc;
-        }
-
         .main-title {
-            font-size: 2.4rem;
+            font-size: 2.25rem;
             letter-spacing: -0.02em;
         }
 
         @media (max-width: 640px) {
             .main-title {
-                font-size: 2.1rem;
+                font-size: 1.95rem;
             }
         }
 
@@ -98,26 +94,25 @@
 <body>
     <!-- 跑马灯 -->
     <div class="marquee-container">
-        <div class="marquee text-lg">
+        <div class="marquee">
             🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 py-6 md:py-10">
-        
-        <!-- 标题 + 音质切换 -->
+    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 py-8">
+
+        <!-- 标题 + 音质切换按钮 -->
         <div class="text-center mb-8">
             <h1 class="main-title font-bold bg-gradient-to-r from-indigo-300 via-violet-400 to-purple-300 bg-clip-text text-transparent">
                 ♡｡Eternity.✨音乐
             </h1>
-            <p class="text-white/60 mt-1 text-base">沉浸式 · 高清无损 · 永恒聆听</p>
 
-            <!-- 音质选择 -->
-            <div class="flex justify-center gap-2 mt-5 flex-wrap">
+            <!-- 音质切换按钮（全部保留） -->
+            <div class="flex justify-center gap-3 mt-6 flex-wrap">
                 <button v-for="q in qualities" :key="q.value"
                     @click="currentQuality = q.value"
-                    class="quality-btn px-6 py-2 rounded-3xl text-sm font-medium border border-white/20 hover:border-violet-400"
+                    class="quality-btn px-8 py-3 rounded-3xl text-base font-medium border border-white/20 hover:border-violet-400"
                     :class="{ 'quality-btn-active': currentQuality === q.value }">
                     {{ q.label }}
                 </button>
@@ -142,11 +137,10 @@
         </div>
 
         <!-- 当前播放器 -->
-        <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 custom-player">
+        <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8">
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <div class="relative flex-shrink-0">
                     <img :src="currentSong.cover" class="w-32 h-32 md:w-40 md:h-40 rounded-2xl shadow-2xl object-cover" @error="currentSong.cover = defaultCover">
-                    <div class="absolute -bottom-1 -right-1 bg-violet-600 text-white text-xs px-2.5 py-1 rounded-full">NOW</div>
                 </div>
 
                 <div class="flex-1 w-full">
@@ -155,7 +149,6 @@
                         <p class="text-white/70">{{ currentSong.artist }}</p>
                     </div>
 
-                    <!-- 自定义播放控件 -->
                     <div class="flex items-center justify-center md:justify-start gap-8 mt-6">
                         <button @click="prevSong" class="text-4xl hover:scale-110 transition">⏮</button>
                         <button @click="togglePlay" 
@@ -169,7 +162,7 @@
             <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
         </div>
 
-        <!-- 播放列表 -->
+        <!-- 播放列表（你的11首歌曲全部保留） -->
         <div class="glass-modern rounded-3xl overflow-hidden mb-8">
             <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/30">
                 <div class="flex items-center gap-3">
@@ -209,7 +202,7 @@
             </div>
 
             <div v-else-if="!songs.length && !loading" class="p-20 text-center text-white/50">
-                输入关键词开始你的音乐之旅 ✨
+                输入关键词开始搜索
             </div>
 
             <div v-else class="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
@@ -225,13 +218,10 @@
             </div>
         </div>
 
-        <div class="text-center mt-10 text-white/30 text-sm">
-            ♡｡Eternity.✨音乐 · 为你永恒守候每一首旋律
-        </div>
     </div>
 
     <script>
-        const { createApp } = Vue;
+        const { createApp, ref } = Vue;
         const PROXY = 'https://seep.eu.org/';
 
         createApp({
@@ -254,7 +244,7 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的专属歌单
+                // 你上传的11首歌曲（全部保留）
                 const specialPlaylist = [
                     { id: 1001, name: "嘎嘎", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/yjarpu.flac" },
                     { id: 1002, name: "爱如星火", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/d5bklp.flac" },
@@ -269,9 +259,11 @@
                     { id: 1011, name: "空位", artist: "Eternity", cover: defaultCover, url: "https://streamshare.wireway.ch/download/yt5oyld9" }
                 ];
 
-                // 初始化加载专属歌单
+                // 初始化加载你的歌曲
                 playlist.value = [...specialPlaylist];
-                if (playlist.value.length > 0) playSong(0);
+                if (playlist.value.length > 0) {
+                    setTimeout(() => playSong(0), 300);
+                }
 
                 const searchMusic = async () => {
                     if (!keyword.value.trim()) return;
@@ -307,9 +299,8 @@
                 };
 
                 const getPlayUrl = (song) => {
-                    if (song.url) return song.url;
+                    if (song.url) return song.url;   // 你的上传歌曲直接使用原链接
                     if (!song.mid) return null;
-
                     const levelMap = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
                     return `https://music.nxinxz.com/kgqq/tx.php?id=${song.mid}&level=${levelMap[currentQuality.value]}&type=mp3`;
                 };
@@ -331,13 +322,8 @@
                 const togglePlay = () => {
                     const audio = document.querySelector('audio');
                     if (!audio) return;
-                    if (isPlaying.value) {
-                        audio.pause();
-                        isPlaying.value = false;
-                    } else {
-                        audio.play();
-                        isPlaying.value = true;
-                    }
+                    isPlaying.value ? audio.pause() : audio.play();
+                    isPlaying.value = !isPlaying.value;
                 };
 
                 const nextSong = () => {
@@ -373,7 +359,7 @@
                 };
 
                 const onPlayError = () => {
-                    alert('当前音质播放失败，已切换下一首');
+                    alert('播放失败，已自动跳到下一首');
                     nextSong();
                 };
 
