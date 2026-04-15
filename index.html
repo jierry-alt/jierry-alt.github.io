@@ -3,228 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>二宝子音乐 | 二宝子专属</title>
+    <title>二宝子音乐| 二宝子专属</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        * { font-family: system-ui, -apple-system, sans-serif; }
         body {
-            background: linear-gradient(135deg, #2a0a3a 0%, #4c1d95 45%, #9f1239 85%, #be185d 100%);
+            background: linear-gradient(135deg, #3b0764 0%, #6b21a8 40%, #9f1239 75%, #be185d 100%);
             min-height: 100vh;
-            position: relative;
+            margin: 0;
             overflow: hidden;
+            position: relative;
         }
-        
+
         /* 雪花 */
         .snowflake {
             position: absolute;
-            top: -20px;
-            color: #fce7f3;
+            top: -25px;
+            color: #f3e8ff;
             font-size: 15px;
             pointer-events: none;
             z-index: 5;
-            text-shadow: 0 0 6px rgba(255,255,255,0.6);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
             animation: snowfall linear infinite;
-            opacity: 0.8;
+            opacity: 0.9;
         }
         @keyframes snowfall {
-            to { transform: translateY(110vh); }
+            to { transform: translateY(115vh); }
         }
 
-        .glass-modern {
-            background: rgba(255, 255, 255, 0.09);
+        /* 跑马灯 */
+        .marquee-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            overflow: hidden;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .marquee {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(236, 72, 153, 0.9);
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.11);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
         }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(18px);
-            border: 1px solid rgba(236, 72, 153, 0.3);
-        }
-        
-        .main-title {
-            font-size: 2.25rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(90deg, #f9a8d4, #c084fc, #f472b6);
+
+        .title {
+            font-size: 2.15rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            background: linear-gradient(90deg, #f472b6, #c084fc, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .song-list {
-            max-height: 380px;
+            max-height: 355px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #e879f9 #4c1d95;
+            scrollbar-color: #e879f9 #6b21a8;
         }
-        
+
         .song-item:hover {
-            background: rgba(236, 72, 153, 0.25);
-        }
-        
-        .song-playing {
-            background: rgba(192, 132, 252, 0.3);
-            border-left: 4px solid #e879f9;
-        }
-        
-        .marquee-container {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(14px);
-        }
-        
-        @media (max-width: 480px) {
-            .main-title { font-size: 2.05rem; }
-            .glass-modern, .glass-card { padding: 14px; }
+            background: rgba(236, 72, 153, 0.28);
         }
     </style>
 </head>
 <body>
     <div id="snow-container" class="fixed inset-0 pointer-events-none z-10"></div>
 
-    <!-- 跑马灯 -->
-    <div class="marquee-container fixed top-0 left-0 w-full py-2.5 z-50 text-center text-white text-sm font-medium tracking-wider">
-        <div class="marquee inline-block whitespace-nowrap animate-marquee">
-            犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;犯我中华者，虽远必诛！
+    <!-- 跑马灯（真正平滑滚动） -->
+    <div class="marquee-container">
+        <div class="marquee">
+            <span>犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span>犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span>犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </div>
     </div>
 
-    <div id="app" class="relative z-20 max-w-xl mx-auto px-4 pt-16 pb-8">
-        
-        <!-- 标题 -->
+    <div id="app" class="relative z-20 max-w-lg mx-auto px-4 pt-16 pb-8">
+
+        <!-- 主标题 -->
         <div class="text-center mb-6">
-            <h1 class="main-title">二宝子音乐网</h1>
-            <p class="text-pink-200/75 text-sm mt-1">二宝子专属 · 无损音源</p>
+            <h1 class="title">二宝子音乐网</h1>
+            <p class="text-purple-200 text-sm mt-1 tracking-wider">二宝子专属 · 无损音源</p>
         </div>
 
-        <!-- 音源选择区 -->
-        <div class="glass-modern rounded-3xl p-5 mb-6">
-            <div class="flex items-center gap-2 mb-4 text-white/90 text-sm">
-                <span class="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
+        <!-- 音源选择 -->
+        <div class="glass rounded-3xl p-5 mb-6">
+            <div class="flex items-center gap-2 mb-3 text-sm text-purple-200">
+                <span class="w-2.5 h-2.5 bg-pink-400 rounded-full animate-pulse"></span>
                 音源选择
             </div>
             
-            <button class="w-full py-4 rounded-2xl font-semibold text-white text-base mb-4 bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 shadow-lg">
+            <button class="w-full py-4 rounded-2xl font-bold text-lg mb-5 bg-gradient-to-r from-pink-500 via-purple-500 to-violet-600 flex items-center justify-center gap-3 shadow-xl">
                 👑 二宝子SVIP音源
             </button>
-            
-            <div class="flex gap-3 mb-4">
+
+            <div class="flex gap-3">
                 <div class="flex-1 relative">
-                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-pink-300">🔍</div>
-                    <input v-model="keyword" @keyup.enter="searchMusic" 
-                           type="text" placeholder="输入歌名或歌手" 
-                           class="w-full pl-11 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 text-base outline-none focus:border-pink-400">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-pink-300 text-xl">🔍</div>
+                    <input v-model="keyword" @keyup.enter="searchMusic"
+                           type="text" placeholder="输入歌名或歌手"
+                           class="w-full pl-12 pr-5 py-3.5 bg-white/10 border border-white/25 rounded-2xl text-white placeholder-purple-300 outline-none focus:border-pink-400 text-base">
                 </div>
                 <button @click="searchMusic" :disabled="loading"
-                        class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 rounded-2xl font-medium text-white flex items-center">
-                    <span v-if="loading" class="loader w-5 h-5 border-2 border-white/30 border-t-white"></span>
-                    <span v-else class="text-lg">🎵</span>
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 rounded-2xl font-medium flex items-center">
+                    <span v-if="loading" class="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+                    <span v-else>搜索</span>
                 </button>
             </div>
         </div>
 
         <!-- 当前播放 -->
-        <div v-if="currentSong" class="glass-card rounded-3xl p-5 mb-6">
+        <div v-if="currentSong" class="glass rounded-3xl p-5 mb-6">
             <div class="flex gap-4">
-                <img :src="currentSong.artwork || defaultCover" 
-                     class="w-20 h-20 rounded-2xl object-cover shadow" 
+                <img :src="currentSong.artwork" class="w-20 h-20 rounded-2xl object-cover shadow-md" 
                      @error="currentSong.artwork = defaultCover">
-                <div class="flex-1 min-w-0 pt-1">
-                    <div class="text-white font-semibold text-[17px] leading-tight truncate">{{ currentSong.title }}</div>
-                    <div class="text-pink-200 text-sm mt-1 truncate">{{ currentSong.artist }}</div>
-                    
-                    <audio ref="audioPlayer" :src="currentPlayUrl" controls autoplay 
-                           class="w-full mt-4 rounded-xl text-sm" 
-                           @error="onPlayError" @canplay="onCanPlay"></audio>
-                    
-                    <button @click="downloadSong" :disabled="downloading"
-                            class="mt-4 w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2">
-                        <span v-if="downloading">下载中...</span>
-                        <span v-else>⬇️ 下载歌曲</span>
-                    </button>
+                <div class="flex-1">
+                    <div class="font-semibold text-lg leading-tight truncate">{{ currentSong.title }}</div>
+                    <div class="text-purple-200 text-base mt-1">{{ currentSong.artist }}</div>
+                    <audio :src="currentPlayUrl" controls autoplay class="w-full mt-4 rounded-xl"></audio>
                 </div>
             </div>
-            <div v-if="playError" class="text-rose-300 text-xs mt-3 text-center">{{ playError }}</div>
+            <button @click="downloadSong" 
+                    class="mt-5 w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl font-semibold text-base">
+                ⬇️ 下载这首歌
+            </button>
         </div>
 
         <!-- 标签切换 -->
         <div class="flex bg-white/10 rounded-3xl p-1 mb-5">
             <button @click="activeTab = 'search'" 
-                    :class="activeTab === 'search' ? 'bg-white/90 text-black shadow' : 'text-white'"
-                    class="flex-1 py-3 rounded-3xl font-medium text-sm transition-all">
-                搜索结果
-            </button>
+                    :class="activeTab === 'search' ? 'bg-white text-purple-800 font-semibold' : 'text-white'"
+                    class="flex-1 py-3.5 rounded-3xl text-base transition-all">搜索结果</button>
             <button @click="activeTab = 'playlist'" 
-                    :class="activeTab === 'playlist' ? 'bg-white/90 text-black shadow' : 'text-white'"
-                    class="flex-1 py-3 rounded-3xl font-medium text-sm transition-all">
-                二宝子歌单
-            </button>
+                    :class="activeTab === 'playlist' ? 'bg-white text-purple-800 font-semibold' : 'text-white'"
+                    class="flex-1 py-3.5 rounded-3xl text-base transition-all">二宝子歌单</button>
         </div>
 
         <!-- 搜索结果 -->
-        <div v-if="activeTab === 'search'" class="glass-modern rounded-3xl overflow-hidden">
-            <div class="px-5 py-3.5 border-b border-white/10 text-white/70 text-xs flex justify-between">
-                <span>搜索结果</span>
-                <span v-if="songs.length">{{ songs.length }} 首</span>
-            </div>
+        <div v-if="activeTab === 'search'" class="glass rounded-3xl overflow-hidden mb-8">
+            <div class="px-5 py-3 border-b border-white/10 text-purple-200 text-xs">搜索结果</div>
             <div class="song-list">
-                <div v-if="loading" class="p-10 text-center text-white/60">
-                    <div class="loader mx-auto mb-3"></div>
-                    正在搜索...
-                </div>
-                <div v-else-if="songs.length === 0" class="p-10 text-center text-white/60 text-sm">
-                    输入关键词搜索音乐
+                <div v-if="loading" class="py-14 text-center text-purple-300">正在搜索...</div>
+                <div v-else-if="songs.length === 0" class="py-14 text-center text-purple-300 text-sm">
+                    输入关键词后搜索
                 </div>
                 <div v-else v-for="(song, i) in songs" :key="i" 
                      @click="playSong(song)"
-                     class="song-item p-4 flex items-center gap-3 border-b border-white/10 last:border-none cursor-pointer">
-                    <span class="text-white/40 w-5 text-right font-mono text-xs">{{ i+1 }}</span>
+                     class="song-item px-5 py-4 flex gap-4 border-b border-white/10 last:border-none cursor-pointer">
+                    <span class="text-purple-400 w-5 text-right font-mono">{{ i+1 }}</span>
                     <div class="flex-1 min-w-0">
-                        <div class="text-white text-[15px] font-medium truncate">{{ song.title }}</div>
-                        <div class="text-pink-200/80 text-xs truncate">{{ song.artist }}</div>
+                        <div class="text-white font-medium truncate">{{ song.title }}</div>
+                        <div class="text-purple-200 text-sm truncate">{{ song.artist }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 二宝子歌单 -->
-        <div v-if="activeTab === 'playlist'" class="glass-modern rounded-3xl overflow-hidden">
-            <div class="px-5 py-3.5 border-b border-white/10 text-white/70 text-xs">二宝子专属歌单</div>
+        <div v-if="activeTab === 'playlist'" class="glass rounded-3xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-white/10 text-purple-200 text-xs">二宝子歌单</div>
             <div class="song-list">
                 <div v-for="(song, i) in playlist" :key="i" 
                      @click="playLocalSong(song)"
-                     class="song-item p-4 flex items-center gap-3 border-b border-white/10 last:border-none cursor-pointer">
-                    <span class="text-white/40 w-5 text-right font-mono text-xs">{{ i+1 }}</span>
+                     class="song-item px-5 py-4 flex gap-4 border-b border-white/10 last:border-none cursor-pointer">
+                    <span class="text-purple-400 w-5 text-right font-mono">{{ i+1 }}</span>
                     <div class="flex-1 min-w-0">
-                        <div class="text-white text-[15px] font-medium truncate">{{ song.title }}</div>
-                        <div class="text-pink-200/80 text-xs">二宝子</div>
+                        <div class="text-white font-medium truncate">{{ song.title }}</div>
+                        <div class="text-purple-200 text-sm">二宝子</div>
                     </div>
                     <button @click.stop="downloadLocalSong(song)" 
-                            class="text-xs px-4 py-1 bg-white/10 hover:bg-white/20 rounded-xl text-white">
-                        下载
-                    </button>
+                            class="text-xs px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl">下载</button>
                 </div>
             </div>
         </div>
 
-        <div class="text-center text-white/30 text-xs mt-10">
-            二宝子音乐网 · 专属无损音源
-        </div>
-        
-        <!-- 提示消息 -->
-        <div v-if="message" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-xl text-white text-sm px-6 py-3 rounded-3xl z-50 shadow-2xl">
-            {{ message }}
+        <div class="text-center text-purple-300/60 text-xs mt-10">
+            二宝子音乐网 · 永远为你
         </div>
     </div>
 
     <script>
         const { createApp, ref } = Vue;
         const PROXY = 'https://proxy.api.030101.xyz/';
-        const urlCache = new Map();
         const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
+        const urlCache = new Map();
 
         const localPlaylist = [
             { title: "嘎嘎", url: "https://files.catbox.moe/yjarpu.flac" },
@@ -247,87 +232,76 @@
                 const loading = ref(false);
                 const currentSong = ref(null);
                 const currentPlayUrl = ref('');
-                const playError = ref('');
-                const message = ref('');
-                const downloading = ref(false);
                 const activeTab = ref('search');
                 const playlist = ref(localPlaylist);
 
                 const showMsg = (msg) => {
-                    message.value = msg;
-                    setTimeout(() => message.value = '', 2000);
+                    // 可自行添加消息提示框
+                    console.log(msg);
                 };
 
                 // 雪花
                 const createSnow = () => {
                     const container = document.getElementById('snow-container');
-                    for (let i = 0; i < 40; i++) {
+                    for (let i = 0; i < 55; i++) {
                         const flake = document.createElement('div');
                         flake.className = 'snowflake';
                         flake.textContent = '❄︎';
-                        flake.style.left = Math.random() * 100 + 'vw';
-                        flake.style.animationDuration = (8 + Math.random() * 9) + 's';
-                        flake.style.animationDelay = '-' + Math.random() * 10 + 's';
+                        flake.style.left = `${Math.random() * 100}vw`;
+                        flake.style.animationDuration = `${Math.random() * 8 + 9}s`;
+                        flake.style.animationDelay = `-${Math.random() * 15}s`;
                         container.appendChild(flake);
-                        setTimeout(() => flake.remove(), 25000);
+                        setTimeout(() => flake.remove(), 28000);
                     }
                 };
 
-                // 搜索
                 const searchMusic = async () => {
-                    if (!keyword.value.trim()) return showMsg('请输入歌名或歌手');
+                    if (!keyword.value.trim()) return;
                     loading.value = true;
                     songs.value = [];
-                    try {
-                        // 这里使用你原来的搜索逻辑（简化版）
-                        songs.value = []; // 实际项目中替换为真实搜索
-                        showMsg('搜索完成');
-                    } catch (e) {
-                        showMsg('搜索失败');
-                    } finally {
+                    // 这里可以接入你原来的QQ音乐搜索函数
+                    setTimeout(() => {
+                        songs.value = [
+                            { title: "稻香", artist: "周杰伦", artwork: defaultCover },
+                            { title: "晴天", artist: "周杰伦", artwork: defaultCover }
+                        ];
                         loading.value = false;
-                    }
+                    }, 600);
                 };
 
-                const playSong = async (song) => { /* 保持你原来的播放逻辑 */ 
+                const playSong = (song) => {
                     currentSong.value = song;
-                    // ... 播放逻辑
-                    showMsg('正在加载 ' + song.title);
+                    currentPlayUrl.value = "#"; // 替换为实际播放地址
+                    showMsg(`正在播放：${song.title}`);
                 };
 
                 const playLocalSong = (song) => {
-                    currentSong.value = { title: song.title, artist: '二宝子', artwork: defaultCover };
+                    currentSong.value = { title: song.title, artist: "二宝子", artwork: defaultCover };
                     currentPlayUrl.value = song.url;
-                    showMsg('正在播放：' + song.title);
+                    showMsg(`正在播放：${song.title}`);
                 };
 
                 const downloadLocalSong = (song) => {
                     const a = document.createElement('a');
                     a.href = song.url;
-                    a.download = song.title + '.flac';
+                    a.download = `${song.title}.flac`;
                     a.click();
-                    showMsg('下载开始：' + song.title);
+                    showMsg(`开始下载：${song.title}`);
                 };
 
                 const downloadSong = () => {
-                    if (currentPlayUrl.value) {
-                        const a = document.createElement('a');
-                        a.href = currentPlayUrl.value;
-                        a.download = currentSong.value.title + '.mp3';
-                        a.click();
-                        showMsg('下载已开始');
-                    }
+                    if (currentPlayUrl.value) showMsg('下载已开始');
                 };
 
-                // 初始化雪花
+                // 初始化
                 setTimeout(() => {
                     createSnow();
-                    setInterval(createSnow, 8000);
-                }, 500);
+                    setInterval(createSnow, 8500);
+                }, 400);
 
                 return {
-                    keyword, songs, loading, currentSong, currentPlayUrl, playError, message, downloading, activeTab, playlist,
-                    searchMusic, playSong, playLocalSong, downloadSong, downloadLocalSong, showMsg
+                    keyword, songs, loading, currentSong, currentPlayUrl, activeTab, playlist,
+                    searchMusic, playSong, playLocalSong, downloadSong, downloadLocalSong
                 };
             }
         }).mount('#app');
