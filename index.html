@@ -99,19 +99,17 @@
             </button>
         </div>
 
-        <!-- 搜索栏（重点优化：按钮极致缩小） -->
+        <!-- 搜索栏（搜索按钮移到下方） -->
         <div class="glass rounded-3xl p-5 mb-6">
-            <div class="flex gap-2">
-                <input v-model="keyword" @keyup.enter="searchMusic"
-                       type="text" placeholder="输入歌名或歌手"
-                       class="flex-1 bg-white/10 border border-white/30 rounded-2xl px-5 py-3.5 text-white placeholder-pink-200 outline-none text-base">
+            <input v-model="keyword" @keyup.enter="searchMusic"
+                   type="text" placeholder="输入歌名或歌手"
+                   class="w-full bg-white/10 border border-white/30 rounded-2xl px-5 py-3.5 text-white placeholder-pink-200 outline-none text-base mb-3">
 
-                <button @click="searchMusic" :disabled="loading"
-                        class="bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-3.5 rounded-2xl text-white font-medium text-xs min-w-[48px] flex items-center justify-center">
-                    <span v-if="loading">...</span>
-                    <span v-else>搜索</span>
-                </button>
-            </div>
+            <button @click="searchMusic" :disabled="loading"
+                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-3.5 rounded-2xl text-white font-medium">
+                <span v-if="loading">搜索中...</span>
+                <span v-else>搜索</span>
+            </button>
         </div>
 
         <!-- 当前播放 -->
