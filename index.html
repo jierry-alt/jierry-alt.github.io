@@ -10,63 +10,79 @@
     <style>
         * { font-family: system-ui, -apple-system, sans-serif; }
         body {
-            background: linear-gradient(135deg, #2a0b4a 0%, #4c1d95 50%, #6b21a8 100%);
+            background: linear-gradient(135deg, #1a0b2e 0%, #3b0764 50%, #581c87 100%);
             min-height: 100vh;
-            position: relative;
-            overflow: hidden;
-            color: white;
+            margin: 0;
+            overflow-x: hidden;
         }
+        /* 雪花 */
         .snow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 2; overflow: hidden;
+            pointer-events: none; z-index: 1; overflow: hidden;
         }
         .snowflake {
             position: absolute; top: -20px; color: #e0f2fe;
-            font-size: 17px; text-shadow: 0 0 10px #c4b5fd;
-            animation: snowfall linear infinite; opacity: 0.8;
+            font-size: 18px; text-shadow: 0 0 12px #c4b5fd;
+            animation: snowfall linear infinite; opacity: 0.75;
         }
         @keyframes snowfall { to { transform: translateY(110vh) rotate(720deg); } }
-        
+
+        /* 跑马灯 */
         .marquee-container {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
-            padding: 9px 0; z-index: 50; overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px);
+            padding: 10px 0; overflow: hidden;
         }
         .marquee {
-            white-space: nowrap; animation: marquee 22s linear infinite;
-            color: #d8b4fe; font-size: 15px; font-weight: 700;
+            white-space: nowrap; animation: marquee 24s linear infinite;
+            color: #e0f2fe; font-size: 15px; font-weight: 700;
         }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        
-        .glass { background: rgba(30, 11, 61, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(192, 132, 252, 0.45); }
-        .title { 
-            font-size: 2.55rem; font-weight: 900; letter-spacing: -0.03em;
-            background: linear-gradient(90deg, #f472b6, #e879f9, #c026d3);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+
+        /* 毛玻璃卡片 */
+        .glass {
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
-        .main-content { padding-top: 68px; }
+
+        .title {
+            font-size: 2.65rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(90deg, #f472b6, #e879f9, #c026d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .song-item:active {
+            background: rgba(255,255,255,0.12);
+            transform: scale(0.98);
+        }
+
+        .main-content { padding-top: 72px; padding-bottom: 40px; }
     </style>
 </head>
 <body>
     <div class="snow" id="snow"></div>
 
-    <!-- 跑马灯：只保留指定内容 -->
+    <!-- 跑马灯 -->
     <div class="marquee-container">
         <div class="marquee">
-            <span>犯我中华者，虽远必诛！</span>
             <span>犯我中华者，虽远必诛！</span>
             <span>犯我中华者，虽远必诛！</span>
         </div>
     </div>
 
     <div id="app" class="relative z-10 max-w-xl mx-auto px-4 main-content">
-        <!-- 主题标题 -->
-        <div class="text-center mb-6">
+        <!-- 标题 -->
+        <div class="text-center mb-7">
             <h1 class="title">二宝子专属</h1>
         </div>
 
-        <!-- 搜索与音源区 -->
-        <div class="glass rounded-3xl p-6 mb-7">
+        <!-- 搜索区域 -->
+        <div class="glass rounded-3xl p-6 mb-8">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
                 <span class="text-purple-100">音源选择</span>
@@ -79,95 +95,95 @@
             <div class="relative mb-4">
                 <div class="absolute left-5 top-1/2 -translate-y-1/2 text-purple-300">🔍</div>
                 <input v-model="keyword" @keyup.enter="searchMusic"
-                    placeholder="输入歌名、歌手，例如 稻香" 
-                    class="w-full pl-12 py-4 bg-white/10 border border-purple-400/40 rounded-2xl text-white placeholder-purple-300 focus:border-purple-400 outline-none text-base">
+                    placeholder="输入歌名、歌手，例如 稻香"
+                    class="w-full pl-12 py-4 bg-white/10 border border-white/30 rounded-2xl text-white placeholder-purple-300 focus:border-purple-400 outline-none">
             </div>
 
             <button @click="searchMusic" :disabled="loading"
-                class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-lg shadow-xl flex items-center justify-center gap-2">
+                class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-lg shadow-xl">
                 <span v-if="loading">搜索中...</span>
                 <span v-else>🎵 搜索音乐</span>
             </button>
 
             <div class="flex flex-wrap gap-2 mt-6">
                 <span v-for="tag in quickTags" :key="tag" @click="keyword = tag; searchMusic()"
-                    class="px-5 py-3 bg-white/10 hover:bg-purple-500/30 rounded-2xl text-sm cursor-pointer transition-all">
+                    class="px-5 py-3 bg-white/10 hover:bg-white/20 rounded-2xl text-sm cursor-pointer transition-all">
                     🎧 {{ tag }}
                 </span>
             </div>
         </div>
 
         <!-- 当前播放器 -->
-        <div v-if="currentSong" class="glass rounded-3xl p-6 mb-7">
+        <div v-if="currentSong" class="glass rounded-3xl p-6 mb-8">
             <div class="flex gap-5">
-                <img :src="currentSong.artwork" class="w-28 h-28 rounded-2xl object-cover shadow-xl" 
+                <img :src="currentSong.artwork" class="w-28 h-28 rounded-2xl object-cover shadow-2xl" 
                      @error="currentSong.artwork = defaultCover">
                 <div class="flex-1 min-w-0">
                     <div class="font-semibold text-xl leading-tight">{{ currentSong.title }}</div>
                     <div class="text-purple-200 text-sm">{{ currentSong.artist }}</div>
-                    <div class="mt-4 text-sm text-purple-100 text-center">
+                    <div class="mt-5 text-sm text-center text-purple-100 h-[72px] overflow-hidden">
                         <div v-for="(line,i) in lyrics" :key="i" 
-                             class="py-1 transition-all" :class="{ 'text-white': i === currentLyricIndex }">
+                             class="py-1 transition-all" :class="{ 'text-white font-medium': i === currentLyricIndex }">
                             {{ line }}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-center gap-10 mt-7">
-                <button @click="prevSong" class="text-4xl text-purple-300">⫷</button>
+            <div class="flex justify-center gap-12 mt-8">
+                <button @click="prevSong" class="text-4xl text-purple-200">⫷</button>
                 <button @click="togglePlay" 
-                        class="w-16 h-16 bg-white/15 hover:bg-white/30 rounded-full text-5xl flex items-center justify-center">
+                        class="w-16 h-16 bg-white/15 hover:bg-white/30 rounded-full text-5xl flex items-center justify-center transition-all">
                     {{ isPlaying ? '❚❚' : '▶' }}
                 </button>
-                <button @click="nextSong" class="text-4xl text-purple-300">⫸</button>
+                <button @click="nextSong" class="text-4xl text-purple-200">⫸</button>
             </div>
 
             <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" class="hidden"></audio>
 
-            <button @click="downloadSong" class="mt-6 w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl font-semibold">
+            <button @click="downloadSong" class="mt-7 w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl font-semibold text-white">
                 ⬇️ 下载这首歌
             </button>
         </div>
 
         <!-- 搜索结果 -->
-        <div v-if="searchResults.length > 0" class="glass rounded-3xl p-5 mb-7">
-            <div class="font-semibold text-lg mb-4">🔍 搜索结果 ({{ searchResults.length }} 首)</div>
-            <div class="divide-y divide-purple-400/20 max-h-[260px] overflow-y-auto">
+        <div v-if="searchResults.length" class="glass rounded-3xl p-6 mb-8">
+            <div class="font-semibold mb-4 text-lg">🔍 搜索结果 ({{ searchResults.length }} 首)</div>
+            <div class="max-h-72 overflow-y-auto divide-y divide-white/10">
                 <div v-for="song in searchResults" :key="song.id" 
                      @click="playSong(song)"
-                     class="py-4 flex gap-4 items-center cursor-pointer hover:bg-white/5">
-                    <img :src="song.artwork" class="w-12 h-12 rounded-xl" @error="song.artwork = defaultCover">
+                     class="py-4 flex gap-4 cursor-pointer hover:bg-white/10 rounded-xl px-2">
+                    <img :src="song.artwork" class="w-12 h-12 rounded-xl" @error="song.artwork=defaultCover">
                     <div class="flex-1">
                         <div class="font-medium">{{ song.title }}</div>
-                        <div class="text-purple-300 text-sm">{{ song.artist }}</div>
+                        <div class="text-purple-200/80 text-sm">{{ song.artist }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 播放列表（已添加11首歌） -->
+        <!-- 播放列表（11首歌曲目录） -->
         <div class="glass rounded-3xl overflow-hidden">
-            <div class="px-6 py-5 border-b border-purple-400/30 bg-black/30 flex justify-between items-center">
+            <div class="px-6 py-5 border-b border-white/10 bg-white/5 flex justify-between items-center sticky top-0 z-10">
                 <span class="font-bold text-lg">播放列表 ({{ playlist.length }} 首)</span>
-                <span class="text-purple-300 text-sm">点击播放</span>
+                <span class="text-purple-200/70 text-sm">点击播放</span>
             </div>
-            <div class="max-h-[380px] overflow-y-auto divide-y divide-purple-400/10">
+            <div class="max-h-[420px] overflow-y-auto">
                 <div v-for="(song, idx) in playlist" :key="song.id" 
                      @click="playSong(song)"
-                     class="px-6 py-4 flex items-center gap-4 cursor-pointer hover:bg-white/5">
-                    <div class="w-6 text-right text-purple-300/70 font-mono">{{ String(idx+1).padStart(2, '0') }}</div>
-                    <img :src="song.artwork" class="w-12 h-12 rounded-xl object-cover" @error="song.artwork = defaultCover">
+                     class="song-item px-6 py-5 flex items-center gap-4 border-b border-white/10 last:border-none">
+                    <div class="w-6 text-right text-purple-300/70 font-mono">{{ String(idx+1).padStart(2,'0') }}</div>
+                    <img :src="song.artwork" class="w-14 h-14 rounded-2xl object-cover flex-shrink-0" @error="song.artwork = defaultCover">
                     <div class="flex-1 min-w-0">
                         <div class="font-medium truncate">{{ song.title }}</div>
                         <div class="text-purple-200/70 text-sm truncate">{{ song.artist }}</div>
                     </div>
-                    <div class="text-xs text-purple-300/60">{{ song.duration }}</div>
+                    <div class="text-xs text-purple-300/60 font-mono">{{ song.duration }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="text-center mt-8 text-purple-300/50 text-xs">
+        <div class="text-center mt-10 text-purple-300/40 text-xs tracking-widest">
             二宝子专属音乐
         </div>
     </div>
@@ -177,7 +193,7 @@
         
         const defaultCover = 'https://picsum.photos/id/1015/300/300';
 
-        // 你上传的11首歌曲（已完整添加）
+        // 你上传的11首歌曲
         const builtInPlaylist = [
             { id: 1, title: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", artwork: "https://picsum.photos/id/1015/300/300", duration: "04:12" },
             { id: 2, title: "那一年那一天", artist: "未知歌手", url: "https://files.catbox.moe/fawyem.flac", artwork: "https://picsum.photos/id/102/300/300", duration: "05:05" },
@@ -206,15 +222,16 @@
 
                 const audioPlayer = ref(null);
 
+                // 创建雪花
                 const createSnow = () => {
                     const container = document.getElementById('snow');
-                    const chars = ['❄', '❅', '❆', '✽'];
-                    for (let i = 0; i < 80; i++) {
+                    const chars = ['❄','❅','❆','✽'];
+                    for (let i = 0; i < 85; i++) {
                         const flake = document.createElement('div');
                         flake.className = 'snowflake';
                         flake.textContent = chars[Math.floor(Math.random() * chars.length)];
                         flake.style.left = Math.random() * 100 + 'vw';
-                        flake.style.animationDuration = (Math.random() * 14 + 16) + 's';
+                        flake.style.animationDuration = (Math.random() * 14 + 17) + 's';
                         flake.style.animationDelay = '-' + Math.random() * 25 + 's';
                         container.appendChild(flake);
                     }
@@ -271,7 +288,7 @@
                     createSnow();
                     setTimeout(() => {
                         if (playlist.value.length) playSong(playlist.value[0]);
-                    }, 600);
+                    }, 800);
                 });
 
                 return {
