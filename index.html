@@ -24,7 +24,7 @@
 
         .marquee-container {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);
             padding: 10px 0; overflow: hidden;
         }
         .marquee {
@@ -48,8 +48,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .main-content { padding-top: 72px; padding-bottom: 40px; }
     </style>
 </head>
 <body>
@@ -62,21 +60,23 @@
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-xl mx-auto px-4 main-content">
-        <div class="text-center mb-7">
+    <div id="app" class="relative z-10 max-w-xl mx-auto px-4 pt-20 pb-10">
+        <div class="text-center mb-8">
             <h1 class="title">二宝子专属</h1>
         </div>
 
-        <!-- 搜索区域 -->
+        <!-- 音源选择区域 -->
         <div class="glass rounded-3xl p-6 mb-8">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
                 <span class="text-purple-100">音源选择</span>
             </div>
 
-            <button class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-lg shadow-xl flex items-center justify-center gap-2 mb-6">
-                👑 二宝子SVIP音源
+            <!-- SVIP按钮（简洁写SVIP，但突出音乐源效果） -->
+            <button class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 font-bold text-lg shadow-xl flex items-center justify-center gap-2 mb-2">
+                👑 SVIP
             </button>
+            <div class="text-center text-purple-200 text-sm mb-6">音乐源</div>
 
             <div class="relative mb-4">
                 <div class="absolute left-5 top-1/2 -translate-y-1/2 text-purple-300">🔍</div>
@@ -97,7 +97,7 @@
             </div>
         </div>
 
-        <!-- 当前播放器（已简化） -->
+        <!-- 当前播放器 -->
         <div v-if="currentSong" class="glass rounded-3xl p-6 mb-8">
             <div class="flex gap-5">
                 <img :src="currentSong.artwork" class="w-28 h-28 rounded-2xl object-cover shadow-2xl" 
@@ -105,7 +105,6 @@
                 <div class="flex-1 min-w-0">
                     <div class="font-semibold text-xl leading-tight">{{ currentSong.title }}</div>
                     <div class="text-purple-200 text-sm">{{ currentSong.artist }}</div>
-                    
                     <div class="mt-5 text-sm text-center text-purple-100 h-[72px] overflow-hidden">
                         <div v-for="(line,i) in lyrics" :key="i" 
                              class="py-1 transition-all" :class="{ 'text-white font-medium': i === currentLyricIndex }">
@@ -124,17 +123,10 @@
                 <button @click="nextSong" class="text-4xl text-purple-200">⫸</button>
             </div>
 
-            <!-- 播放提示 -->
-            <div class="mt-6 text-center text-amber-300 text-sm" v-if="playError">
-                ⚠️ {{ playError }}<br>
-                <span class="text-purple-200">建议点击下方下载后本地播放</span>
-            </div>
-
             <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" class="hidden"></audio>
 
-            <button @click="downloadSong" 
-                    class="mt-7 w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl font-semibold text-white flex items-center justify-center gap-2">
-                ⬇️ 下载这首歌（推荐方式）
+            <button @click="downloadSong" class="mt-7 w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl font-semibold text-white">
+                ⬇️ 下载这首歌（推荐）
             </button>
         </div>
 
@@ -154,7 +146,7 @@
             </div>
         </div>
 
-        <!-- 播放列表（11首歌曲） -->
+        <!-- 播放列表 -->
         <div class="glass rounded-3xl overflow-hidden">
             <div class="px-6 py-5 border-b border-white/10 bg-white/5 flex justify-between items-center sticky top-0 z-10">
                 <span class="font-bold text-lg">播放列表 ({{ playlist.length }} 首)</span>
@@ -163,7 +155,7 @@
             <div class="max-h-[420px] overflow-y-auto">
                 <div v-for="(song, idx) in playlist" :key="song.id" 
                      @click="playSong(song)"
-                     class="song-item px-6 py-5 flex items-center gap-4 border-b border-white/10 last:border-none">
+                     class="px-6 py-5 flex items-center gap-4 border-b border-white/10 last:border-none">
                     <div class="w-6 text-right text-purple-300/70 font-mono">{{ String(idx+1).padStart(2,'0') }}</div>
                     <img :src="song.artwork" class="w-14 h-14 rounded-2xl object-cover flex-shrink-0" @error="song.artwork = defaultCover">
                     <div class="flex-1 min-w-0">
@@ -210,4 +202,93 @@
                 const playError = ref('');
                 const currentLyricIndex = ref(0);
                 const lyrics = ref(["二宝子最爱的歌～", "永远陪着你", "♡ 二宝子专属 ♡"]);
-                const quickTags = ['晴天', '稻香',
+                const quickTags = ['晴天', '稻香', '夜曲', '七里香', '告白气球'];
+
+                const audioPlayer = ref(null);
+
+                const createSnow = () => {
+                    const container = document.getElementById('snow');
+                    const chars = ['❄','❅','❆','✽'];
+                    for (let i = 0; i < 85; i++) {
+                        const flake = document.createElement('div');
+                        flake.className = 'snowflake';
+                        flake.textContent = chars[Math.floor(Math.random() * chars.length)];
+                        flake.style.left = Math.random() * 100 + 'vw';
+                        flake.style.animationDuration = (Math.random() * 14 + 17) + 's';
+                        flake.style.animationDelay = '-' + Math.random() * 25 + 's';
+                        container.appendChild(flake);
+                    }
+                };
+
+                const playSong = (song) => {
+                    currentSong.value = song;
+                    currentPlayUrl.value = song.url;
+                    currentLyricIndex.value = 0;
+                    playError.value = '';
+
+                    if (audioPlayer.value) {
+                        audioPlayer.value.src = song.url;
+                        audioPlayer.value.play().catch(() => {
+                            playError.value = '在线播放失败，请点击下方下载';
+                        });
+                    }
+                };
+
+                const togglePlay = () => {
+                    if (!audioPlayer.value) return;
+                    if (isPlaying.value) {
+                        audioPlayer.value.pause();
+                    } else {
+                        audioPlayer.value.play();
+                    }
+                    isPlaying.value = !isPlaying.value;
+                };
+
+                const nextSong = () => {
+                    if (!currentSong.value) return;
+                    const idx = playlist.value.findIndex(s => s.id === currentSong.value.id);
+                    playSong(playlist.value[(idx + 1) % playlist.value.length]);
+                };
+
+                const prevSong = () => {
+                    if (!currentSong.value) return;
+                    const idx = playlist.value.findIndex(s => s.id === currentSong.value.id);
+                    playSong(playlist.value[(idx - 1 + playlist.value.length) % playlist.value.length]);
+                };
+
+                const searchMusic = () => {
+                    if (!keyword.value.trim()) {
+                        searchResults.value = [];
+                        return;
+                    }
+                    const term = keyword.value.toLowerCase().trim();
+                    searchResults.value = playlist.value.filter(song => 
+                        song.title.toLowerCase().includes(term) || song.artist.toLowerCase().includes(term)
+                    );
+                };
+
+                const downloadSong = () => {
+                    if (!currentPlayUrl.value) return;
+                    const a = document.createElement('a');
+                    a.href = currentPlayUrl.value;
+                    a.download = `${currentSong.value.title}.flac`;
+                    a.click();
+                };
+
+                onMounted(() => {
+                    createSnow();
+                    setTimeout(() => {
+                        if (playlist.value.length) playSong(playlist.value[0]);
+                    }, 800);
+                });
+
+                return {
+                    keyword, playlist, searchResults, currentSong, currentPlayUrl, 
+                    isPlaying, playError, currentLyricIndex, lyrics, quickTags,
+                    playSong, togglePlay, nextSong, prevSong, searchMusic, downloadSong
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
