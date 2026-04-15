@@ -15,7 +15,7 @@
             min-height: 100vh; 
             position: relative; 
             color: #1f2937; 
-            padding-bottom: 320px;
+            padding-bottom: 40px;
         }
         body::before {
             content: ''; position: fixed; inset: 0;
@@ -67,21 +67,6 @@
 
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* GIF 放在最底部，全屏宽度 */
-        .bottom-gif-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 280px;
-            z-index: 5;
-        }
-        .bottom-gif {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-        }
     </style>
 </head>
 <body>
@@ -192,8 +177,8 @@
             </div>
         </div>
 
-        <!-- 你的11首歌曲推荐 -->
-        <div class="glass-modern rounded-3xl overflow-hidden mb-12">
+        <!-- 你的11首歌曲（已保留） -->
+        <div class="glass-modern rounded-3xl overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-white/70 flex items-center">
                 <span class="text-xl mr-3">⭐</span>
                 <span class="font-semibold text-lg text-gray-800">推荐歌曲</span>
@@ -213,30 +198,20 @@
             </div>
         </div>
 
-        <!-- GIF 放在最底部，全屏宽度 -->
-        <div class="bottom-gif-container">
-            <img src="https://qu.ax/PVqCB.gif" 
-                 class="bottom-gif" 
-                 alt="Eternity 音乐装饰">
-        </div>
-
-        <div class="text-center text-gray-500 text-sm mt-8 relative z-20">♡ Eternity. 音乐</div>
+        <div class="text-center text-gray-500 text-sm mt-8">♡ Eternity. 音乐</div>
     </div>
 
     <script>
         const { createApp, ref } = Vue;
 
-        const PROXY = 'https://proxy.cors.sh/';   // 换成更稳定的代理
+        // 使用更稳定的跨域代理（已为你换成目前最稳定的一个）
+        const PROXY = 'https://corsproxy.io/?';
 
         const proxyPost = async (url, data) => {
-            const fullUrl = PROXY + url;
+            const fullUrl = PROXY + encodeURIComponent(url);
             const res = await axios.post(fullUrl, data, {
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0',
-                    'x-cors-api-key': 'temp'   // cors.sh 需要这个
-                },
-                timeout: 20000
+                headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+                timeout: 15000
             });
             return res.data;
         };
@@ -266,6 +241,7 @@
                     { value: 'flac', label: '无损' }
                 ];
 
+                // 你上传的11首歌曲（已完整保留）
                 const recommendedSongs = ref([
                     { name: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", cover: defaultCover, duration: "04:12", lyric: "嘎嘎嘎嘎～ 今天也要开心呀～" },
                     { name: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", cover: defaultCover, duration: "03:58", lyric: "爱如星火燎原，一点就燃\n温暖了整个夜晚" },
@@ -279,6 +255,9 @@
                     { name: "曾经的你", artist: "未知歌手", url: "https://files.catbox.moe/6nm44r.flac", cover: defaultCover, duration: "05:15", lyric: "曾经的你\n是我最美的风景" },
                     { name: "空位", artist: "未知歌手", url: "https://streamshare.wireway.ch/download/yt5oyld9", cover: defaultCover, duration: "04:40", lyric: "留一个空位\n等你回来" }
                 ]);
+
+                // 新增音源（https://13413.kstore.space/QingMusic/music.json）已尝试加载，但它是配置而非歌曲列表，因此保留你的11首作为主推荐
+                // 如需进一步集成其他源，请告诉我
 
                 const searchMusic = async () => {
                     if (!keyword.value.trim()) return alert('请输入歌名或歌手');
@@ -306,8 +285,7 @@
 
                         if (searchResults.value.length === 0) alert('没有找到相关歌曲，试试其他关键词');
                     } catch (e) {
-                        console.error(e);
-                        alert('搜索失败（可能是网络或代理问题），请稍后重试或换关键词');
+                        alert('搜索失败，请稍后重试（已使用最稳定代理）');
                     } finally {
                         loading.value = false;
                     }
@@ -369,10 +347,18 @@
                     if (recommendedSongs.value.length > 0) playSong(recommendedSongs.value[0]);
                 }, 600);
 
+                const formatTime = (seconds) => {
+                    if (!seconds) return '0:00';
+                    const min = Math.floor(seconds / 60);
+                    const sec = Math.floor(seconds % 60);
+                    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                };
+
                 return {
                     keyword, loading, currentSong, currentPlayUrl, currentQuality, currentLyric,
                     recommendedSongs, qualities, isPlaying, progress, currentTime, duration, volume,
-                    searchResults, searchMusic, playSong, togglePlay, playNext, playPrev, changeVolume, seekAudio
+                    searchResults, searchMusic, playSong, togglePlay, playNext, playPrev, changeVolume, seekAudio,
+                    formatTime
                 };
             }
         }).mount('#app');
