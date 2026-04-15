@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>♡｡Eternity.✨音乐</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
@@ -19,7 +19,6 @@
             overflow: hidden;
         }
 
-        /* 雪花飘落动画 */
         .snowflake {
             position: fixed;
             top: -15px;
@@ -27,21 +26,16 @@
             font-size: 1.3em;
             pointer-events: none;
             z-index: 5;
-            opacity: 0.9;
+            opacity: 0.85;
             animation: fall linear infinite, sway 4s ease-in-out infinite;
         }
-        @keyframes fall {
-            to { transform: translateY(110vh); }
-        }
-        @keyframes sway {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(30px); }
-        }
+        @keyframes fall { to { transform: translateY(110vh); } }
+        @keyframes sway { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(30px); } }
 
         .marquee-container {
             position: fixed;
             top: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(12px);
             padding: 12px 0;
             z-index: 100;
@@ -59,77 +53,75 @@
         }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        .glass-modern { background: rgba(15, 12, 41, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(167, 139, 250, 0.25); }
-        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); border: 1px solid rgba(167, 139, 250, 0.2); }
+        .glass-modern { background: rgba(15, 12, 41, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(167, 139, 250, 0.25); }
+        .glass-card { background: rgba(255, 255, 255, 0.09); backdrop-filter: blur(16px); border: 1px solid rgba(167, 139, 250, 0.22); }
 
-        .song-item:hover { background: linear-gradient(90deg, rgba(129, 140, 248, 0.3), rgba(167, 139, 250, 0.2)); transform: translateX(6px); }
+        .song-item:hover { 
+            background: linear-gradient(90deg, rgba(129, 140, 248, 0.35), rgba(167, 139, 250, 0.25)); 
+            transform: translateX(8px); 
+        }
+        .song-item.playing { background: rgba(167, 139, 250, 0.25); border-left: 4px solid #a5b4fc; }
 
         .main-title {
-            font-size: 2.05rem;
+            font-size: 2.1rem;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
             background: linear-gradient(90deg, #c4b5fd, #e0d4ff, #a5b4fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            white-space: nowrap;
         }
 
-        @media (max-width: 640px) { .main-title { font-size: 1.85rem; } }
+        @media (max-width: 640px) { .main-title { font-size: 1.9rem; } }
 
         .quality-btn {
-            transition: all 0.3s ease;
-            font-size: 0.93rem;
-            padding: 10px 18px;
-            min-width: 85px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px 20px;
         }
         .quality-btn-active {
             background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
             color: #1e1b4b;
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(165, 180, 252, 0.5);
+            box-shadow: 0 4px 20px rgba(165, 180, 252, 0.6);
         }
     </style>
 </head>
 <body>
-    <!-- 雪花容器 -->
+    <!-- 雪花 -->
     <div id="snow-container" class="fixed inset-0 pointer-events-none z-5"></div>
 
     <!-- 跑马灯 -->
     <div class="marquee-container">
         <div class="marquee">
-            🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;🔥 犯我中华者，虽远必诛！&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
     </div>
 
-    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 pt-16 pb-8">
+    <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 pt-16 pb-12">
 
-        <!-- 标题 + 音质按钮 -->
-        <div class="text-center mb-8">
+        <!-- 标题 + 音质选择 -->
+        <div class="text-center mb-10">
             <h1 class="main-title">♡｡Eternity.✨音乐</h1>
-
-            <div class="flex justify-center gap-2.5 mt-6 flex-wrap">
+            <div class="flex justify-center gap-3 mt-6 flex-wrap">
                 <button v-for="q in qualities" :key="q.value"
                     @click="currentQuality = q.value"
-                    class="quality-btn rounded-3xl text-sm font-medium border border-white/30 hover:border-violet-400"
+                    class="quality-btn rounded-3xl text-sm font-medium border border-white/30 hover:border-violet-400 px-6 py-3"
                     :class="{ 'quality-btn-active': currentQuality === q.value }">
                     {{ q.label }}
                 </button>
             </div>
         </div>
 
-        <!-- 搜索区域 -->
-        <div class="glass-modern rounded-3xl p-6 md:p-8 mb-8">
+        <!-- 搜索 -->
+        <div class="glass-modern rounded-3xl p-6 md:p-8 mb-10">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1 relative">
-                    <div class="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-400 text-2xl">🔍</div>
-                    <input v-model="keyword" @keyup.enter="searchMusic" 
-                        placeholder="搜索歌名、歌手... 如：晴天、周杰伦" 
-                        class="w-full pl-14 pr-6 py-4 bg-white/10 border border-white/30 rounded-2xl text-white placeholder-white/60 focus:border-violet-400 outline-none text-base">
+                    <div class="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-400 text-3xl">🔍</div>
+                    <input v-model="keyword" @keyup.enter="searchMusic"
+                        placeholder="搜索歌名、歌手... 如：晴天、周杰伦"
+                        class="w-full pl-16 pr-6 py-4 bg-white/10 border border-white/30 rounded-2xl text-white placeholder-white/60 focus:border-violet-400 outline-none text-base">
                 </div>
                 <button @click="searchMusic" :disabled="loading"
-                    class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 px-10 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg min-w-[130px]">
+                    class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 px-12 py-4 rounded-2xl font-semibold flex items-center gap-3 shadow-xl min-w-[140px] justify-center">
                     <span v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                     <span v-else>🎵 搜索</span>
                 </button>
@@ -137,103 +129,127 @@
         </div>
 
         <!-- 当前播放器 -->
-        <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8">
-            <div class="flex flex-col md:flex-row items-center gap-6">
+        <div v-if="currentSong" class="glass-card rounded-3xl p-7 mb-10">
+            <div class="flex flex-col md:flex-row items-center gap-8">
                 <div class="relative flex-shrink-0">
-                    <img :src="currentSong.cover" class="w-36 h-36 md:w-44 md:h-44 rounded-2xl shadow-2xl object-cover" @error="currentSong.cover = defaultCover">
+                    <img :src="currentSong.cover" 
+                         class="w-40 h-40 md:w-48 md:h-48 rounded-2xl shadow-2xl object-cover ring-2 ring-white/20"
+                         @error="currentSong.cover = defaultCover">
                 </div>
-                <div class="flex-1 w-full">
-                    <div class="text-center md:text-left">
-                        <h2 class="text-2xl font-bold mb-1">{{ currentSong.name }}</h2>
-                        <p class="text-white/75">{{ currentSong.artist }}</p>
-                    </div>
-                    <div class="flex items-center justify-center md:justify-start gap-8 mt-8">
-                        <button @click="prevSong" class="text-4xl hover:scale-110 transition">⏮</button>
+                <div class="flex-1 text-center md:text-left">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 truncate">{{ currentSong.name }}</h2>
+                    <p class="text-white/75 text-lg">{{ currentSong.artist }}</p>
+
+                    <div class="flex items-center justify-center md:justify-start gap-10 mt-10">
+                        <button @click="prevSong" class="text-5xl hover:scale-110 transition-transform">⏮</button>
                         <button @click="togglePlay" 
-                            class="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full text-4xl shadow-xl hover:scale-105 transition">
+                            class="w-20 h-20 flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full text-5xl shadow-2xl hover:scale-105 transition-all">
                             {{ isPlaying ? '❚❚' : '▶' }}
                         </button>
-                        <button @click="nextSong" class="text-4xl hover:scale-110 transition">⏭</button>
+                        <button @click="nextSong" class="text-5xl hover:scale-110 transition-transform">⏭</button>
                     </div>
                 </div>
             </div>
-            <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
+            <audio ref="audioPlayer" :src="currentPlayUrl" 
+                   @ended="nextSong" 
+                   @error="onPlayError"
+                   @play="isPlaying = true"
+                   @pause="isPlaying = false"
+                   class="hidden"></audio>
         </div>
 
-        <!-- 播放列表（你的11首歌曲全部在这里） -->
-        <div class="glass-card rounded-3xl overflow-hidden mb-8">
+        <!-- 播放列表 -->
+        <div class="glass-card rounded-3xl overflow-hidden mb-10">
             <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/30">
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">📜</span>
-                    <span class="font-semibold text-lg">播放列表 ({{ playlist.length }})</span>
+                    <span class="text-3xl">📜</span>
+                    <span class="font-semibold text-xl">播放列表 ({{ playlist.length }})</span>
                 </div>
-                <button @click="clearPlaylist" class="text-white/60 hover:text-red-400 text-sm">清空</button>
+                <button @click="clearPlaylist" 
+                        class="text-white/60 hover:text-red-400 text-sm font-medium flex items-center gap-1">
+                    <span>🗑</span> 清空
+                </button>
             </div>
-            <div class="max-h-[420px] overflow-y-auto divide-y divide-white/10">
-                <div v-for="(song, idx) in playlist" :key="song.id + idx"
+
+            <div v-if="playlist.length === 0" class="p-16 text-center text-white/50">
+                播放列表为空，快去搜索添加歌曲吧～
+            </div>
+
+            <div v-else class="max-h-[440px] overflow-y-auto divide-y divide-white/10">
+                <div v-for="(song, idx) in playlist" :key="song.id || idx"
                      @click="playFromPlaylist(idx)"
-                     class="song-item p-4 flex items-center gap-4 cursor-pointer">
-                    <div class="w-8 text-center text-white/50 font-mono">{{ String(idx+1).padStart(2, '0') }}</div>
-                    <img :src="song.cover" class="w-12 h-12 rounded-xl object-cover" @error="song.cover = defaultCover">
+                     class="song-item p-5 flex items-center gap-5 cursor-pointer"
+                     :class="{ 'playing': idx === currentIndex }">
+                    <div class="w-8 text-center text-white/50 font-mono text-lg">{{ String(idx+1).padStart(2, '0') }}</div>
+                    <img :src="song.cover || defaultCover" 
+                         class="w-14 h-14 rounded-2xl object-cover shadow-md"
+                         @error="song.cover = defaultCover">
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold truncate">{{ song.name }}</div>
-                        <div class="text-white/60 text-sm truncate">{{ song.artist }}</div>
+                        <div class="font-semibold truncate text-base">{{ song.name }}</div>
+                        <div class="text-white/70 text-sm truncate">{{ song.artist }}</div>
                     </div>
-                    <button @click.stop="removeFromPlaylist(idx)" class="text-white/40 hover:text-red-400">✕</button>
+                    <button @click.stop="removeFromPlaylist(idx)" 
+                            class="text-white/50 hover:text-red-400 text-2xl px-3">✕</button>
                 </div>
             </div>
         </div>
 
         <!-- 搜索结果 -->
         <div class="glass-card rounded-3xl overflow-hidden">
-            <div class="px-6 py-5 border-b border-white/10 flex justify-between items-center">
-                <span class="font-semibold text-lg flex items-center gap-2">
+            <div class="px-6 py-5 border-b border-white/10 flex justify-between items-center bg-black/30">
+                <span class="font-semibold text-xl flex items-center gap-3">
                     <span>🔍</span> 搜索结果
-                    <span v-if="songs.length" class="text-sm bg-white/10 px-3 py-1 rounded-full">{{ songs.length }} 首</span>
+                    <span v-if="songs.length" class="text-sm bg-white/10 px-4 py-1 rounded-full">{{ songs.length }} 首</span>
                 </span>
             </div>
 
-            <div v-if="loading && !songs.length" class="p-20 text-center">
-                <div class="w-10 h-10 border-4 border-violet-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p>正在搜索音乐...</p>
+            <div v-if="loading && !songs.length" class="p-24 text-center">
+                <div class="w-12 h-12 border-4 border-violet-400 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <p class="text-lg">正在搜索音乐，请稍等...</p>
+            </div>
+
+            <div v-else-if="!songs.length && !loading && keyword" class="p-20 text-center text-white/50">
+                未找到匹配的歌曲，试试其他关键词吧
             </div>
 
             <div v-else-if="!songs.length && !loading" class="p-20 text-center text-white/50">
-                输入关键词开始搜索
+                输入关键词开始搜索音乐
             </div>
 
-            <div v-else class="divide-y divide-white/10 max-h-[480px] overflow-y-auto">
-                <div v-for="song in songs" :key="song.id" @click="addToPlaylistAndPlay(song)"
-                    class="song-item p-5 flex items-center gap-5 cursor-pointer">
-                    <img :src="song.cover" class="w-14 h-14 rounded-2xl object-cover shadow">
+            <div v-else class="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
+                <div v-for="song in songs" :key="song.id" 
+                     @click="addToPlaylistAndPlay(song)"
+                     class="song-item p-6 flex items-center gap-6 cursor-pointer hover:bg-white/5">
+                    <img :src="song.cover || defaultCover" 
+                         class="w-16 h-16 rounded-2xl object-cover shadow"
+                         @error="song.cover = defaultCover">
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-base truncate">{{ song.name }}</div>
-                        <div class="text-white/60 text-sm truncate">{{ song.artist }}</div>
+                        <div class="font-semibold text-lg truncate">{{ song.name }}</div>
+                        <div class="text-white/70 text-base truncate">{{ song.artist }}</div>
                     </div>
-                    <button class="text-2xl text-violet-400 hover:scale-110 transition">＋</button>
+                    <button class="text-3xl text-violet-400 hover:scale-125 transition">＋</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const { createApp, ref } = Vue;
+        const { createApp, ref, onMounted } = Vue;
         const PROXY = 'https://proxy.api.030101.xyz/';
 
-        // 创建雪花函数
+        // 创建雪花
         function createSnowflakes() {
             const container = document.getElementById('snow-container');
             if (!container) return;
             const snowChars = ['❄︎', '❅', '❆', '✽', '❉', '❋'];
-            for (let i = 0; i < 70; i++) {
+            for (let i = 0; i < 65; i++) {
                 const flake = document.createElement('div');
                 flake.className = 'snowflake';
                 flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
                 flake.style.left = Math.random() * 100 + 'vw';
-                flake.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                flake.style.animationDelay = '-' + Math.random() * 15 + 's';
-                flake.style.fontSize = (Math.random() * 1.4 + 0.9) + 'em';
-                flake.style.opacity = Math.random() * 0.7 + 0.5;
+                flake.style.animationDuration = (Math.random() * 12 + 12) + 's';
+                flake.style.animationDelay = '-' + Math.random() * 20 + 's';
+                flake.style.fontSize = (Math.random() * 1.5 + 1) + 'em';
                 container.appendChild(flake);
             }
         }
@@ -258,7 +274,7 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的11首上传歌曲（已完整加入）
+                // 你的11首歌曲（已全部加入）
                 const specialPlaylist = [
                     { id: 1001, name: "嘎嘎", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/yjarpu.flac" },
                     { id: 1002, name: "爱如星火", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/d5bklp.flac" },
@@ -273,48 +289,11 @@
                     { id: 1011, name: "空位", artist: "Eternity", cover: defaultCover, url: "https://streamshare.wireway.ch/download/yt5oyld9" }
                 ];
 
+                // 初始化播放列表（关键修复）
                 playlist.value = [...specialPlaylist];
-                if (playlist.value.length > 0) {
-                    setTimeout(() => playSong(0), 400);
-                }
-
-                const searchMusic = async () => {
-                    if (!keyword.value.trim()) return alert('请输入歌名或歌手');
-                    loading.value = true;
-                    songs.value = [];
-
-                    try {
-                        const postData = {
-                            req_1: {
-                                method: "DoSearchForQQMusicDesktop",
-                                module: "music.search.SearchCgiService",
-                                param: { query: keyword.value, num_per_page: 20, page_num: 1, search_type: 0 }
-                            }
-                        };
-
-                        const res = await axios.post(PROXY + 'https://u.y.qq.com/cgi-bin/musicu.fcg', postData, {
-                            headers: { 'Referer': 'https://y.qq.com' }
-                        });
-
-                        const songList = res.data?.req_1?.data?.body?.song?.list || [];
-                        if (songList.length === 0) alert('未找到歌曲，试试其他关键词');
-
-                        songs.value = songList.map(item => ({
-                            id: item.id,
-                            mid: item.mid,
-                            name: item.name,
-                            artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
-                            cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover
-                        }));
-                    } catch (e) {
-                        alert('搜索失败，请检查网络或稍后重试');
-                    } finally {
-                        loading.value = false;
-                    }
-                };
 
                 const getPlayUrl = (song) => {
-                    if (song.url) return song.url;
+                    if (song.url) return song.url;  // 自定义上传歌曲直接使用原链接
                     if (!song.mid) return null;
                     const levelMap = { '128k': 'standard', '320k': 'exhigh', 'flac': 'lossless' };
                     return `https://music.nxinxz.com/kgqq/tx.php?id=${song.mid}&level=${levelMap[currentQuality.value]}&type=mp3`;
@@ -327,17 +306,24 @@
                     currentPlayUrl.value = getPlayUrl(currentSong.value);
 
                     const audio = document.querySelector('audio');
-                    if (audio) {
+                    if (audio && currentPlayUrl.value) {
                         audio.src = currentPlayUrl.value;
-                        audio.play().then(() => isPlaying.value = true).catch(() => {});
+                        audio.load();
+                        audio.play().catch(err => {
+                            console.warn('播放失败:', err);
+                            onPlayError();
+                        });
                     }
                 };
 
                 const togglePlay = () => {
                     const audio = document.querySelector('audio');
                     if (!audio) return;
-                    isPlaying.value ? audio.pause() : audio.play();
-                    isPlaying.value = !isPlaying.value;
+                    if (isPlaying.value) {
+                        audio.pause();
+                    } else {
+                        audio.play().catch(() => {});
+                    }
                 };
 
                 const nextSong = () => {
@@ -358,32 +344,84 @@
                 };
 
                 const playFromPlaylist = (index) => playSong(index);
+
                 const removeFromPlaylist = (index) => {
                     if (index === currentIndex.value) nextSong();
                     playlist.value.splice(index, 1);
-                };
-                const clearPlaylist = () => {
-                    if (confirm('确定清空播放列表吗？')) {
-                        playlist.value = [];
+                    if (playlist.value.length === 0) {
                         currentSong.value = null;
                         isPlaying.value = false;
                     }
                 };
+
+                const clearPlaylist = () => {
+                    if (confirm('确定要清空整个播放列表吗？')) {
+                        playlist.value = [];
+                        currentSong.value = null;
+                        currentIndex.value = -1;
+                        isPlaying.value = false;
+                    }
+                };
+
                 const onPlayError = () => {
-                    alert('播放失败，已自动跳到下一首');
+                    alert('当前歌曲播放失败（可能链接失效），已自动跳到下一首');
                     nextSong();
                 };
 
+                const searchMusic = async () => {
+                    if (!keyword.value.trim()) return alert('请输入搜索关键词');
+                    loading.value = true;
+                    songs.value = [];
+
+                    try {
+                        const postData = {
+                            req_1: {
+                                method: "DoSearchForQQMusicDesktop",
+                                module: "music.search.SearchCgiService",
+                                param: { query: keyword.value, num_per_page: 20, page_num: 1, search_type: 0 }
+                            }
+                        };
+
+                        const res = await axios.post(PROXY + 'https://u.y.qq.com/cgi-bin/musicu.fcg', postData, {
+                            headers: { 'Referer': 'https://y.qq.com' }
+                        });
+
+                        const songList = res.data?.req_1?.data?.body?.song?.list || [];
+                        if (songList.length === 0) {
+                            alert('未找到相关歌曲，换个关键词试试？');
+                        }
+
+                        songs.value = songList.map(item => ({
+                            id: item.id,
+                            mid: item.mid,
+                            name: item.name,
+                            artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
+                            cover: item.album?.mid 
+                                ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` 
+                                : defaultCover
+                        }));
+                    } catch (e) {
+                        console.error(e);
+                        alert('搜索失败，请检查网络或稍后重试');
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                // 初始化自动播放第一首
+                onMounted(() => {
+                    createSnowflakes();
+                    if (playlist.value.length > 0) {
+                        setTimeout(() => playSong(0), 600);
+                    }
+                });
+
                 return {
-                    keyword, songs, loading, currentSong, currentPlayUrl, playlist, isPlaying,
-                    currentQuality, qualities,
+                    keyword, songs, loading, currentSong, currentPlayUrl,
+                    playlist, currentIndex, isPlaying, currentQuality, qualities,
                     searchMusic, togglePlay, nextSong, prevSong,
                     addToPlaylistAndPlay, playFromPlaylist, removeFromPlaylist, clearPlaylist, onPlayError
                 };
-            },
-            mounted() {
-                // 初始化雪花效果
-                createSnowflakes();
             }
         }).mount('#app');
     </script>
