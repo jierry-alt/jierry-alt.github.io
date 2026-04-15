@@ -15,7 +15,7 @@
             min-height: 100vh; 
             position: relative; 
             color: #1f2937; 
-            padding-bottom: 0;
+            padding-bottom: 0; /* 让GIF完全占满底部 */
         }
         body::before {
             content: ''; position: fixed; inset: 0;
@@ -75,13 +75,13 @@
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* GIF 布满最下面全屏 */
+        /* GIF 固定在最底部全屏铺满 */
         .bottom-gif-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 260px;           /* 可根据需要微调高度 */
+            height: 280px;           /* 可微调高度，更大就调高此值 */
             z-index: 5;
             display: flex;
             align-items: flex-end;
@@ -90,8 +90,8 @@
         }
         .bottom-gif {
             width: 100%;
-            height: 260px;
-            object-fit: cover;       /* 布满全屏效果 */
+            height: 280px;
+            object-fit: cover;       /* 布满全屏 */
             opacity: 0.95;
         }
     </style>
