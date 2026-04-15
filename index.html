@@ -22,20 +22,20 @@
         /* 雪花飘落动画 */
         .snowflake {
             position: fixed;
-            top: -10px;
+            top: -15px;
             color: #fff;
-            font-size: 1.2em;
+            font-size: 1.3em;
             pointer-events: none;
-            z-index: 1;
-            opacity: 0.85;
-            animation: fall linear infinite, sway 3s ease-in-out infinite;
+            z-index: 5;
+            opacity: 0.9;
+            animation: fall linear infinite, sway 4s ease-in-out infinite;
         }
         @keyframes fall {
-            to { transform: translateY(105vh); }
+            to { transform: translateY(110vh); }
         }
         @keyframes sway {
             0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(25px); }
+            50% { transform: translateX(30px); }
         }
 
         .marquee-container {
@@ -65,7 +65,7 @@
         .song-item:hover { background: linear-gradient(90deg, rgba(129, 140, 248, 0.3), rgba(167, 139, 250, 0.2)); transform: translateX(6px); }
 
         .main-title {
-            font-size: 2.1rem;
+            font-size: 2.05rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             background: linear-gradient(90deg, #c4b5fd, #e0d4ff, #a5b4fc);
@@ -75,7 +75,7 @@
             white-space: nowrap;
         }
 
-        @media (max-width: 640px) { .main-title { font-size: 1.9rem; } }
+        @media (max-width: 640px) { .main-title { font-size: 1.85rem; } }
 
         .quality-btn {
             transition: all 0.3s ease;
@@ -93,7 +93,7 @@
 </head>
 <body>
     <!-- 雪花容器 -->
-    <div id="snow-container"></div>
+    <div id="snow-container" class="fixed inset-0 pointer-events-none z-5"></div>
 
     <!-- 跑马灯 -->
     <div class="marquee-container">
@@ -105,7 +105,7 @@
 
     <div id="app" class="relative z-10 max-w-5xl mx-auto px-4 pt-16 pb-8">
 
-        <!-- 标题（缩小 + 一行） + 音质按钮（缩小 + 一行排列） -->
+        <!-- 标题 + 音质按钮 -->
         <div class="text-center mb-8">
             <h1 class="main-title">♡｡Eternity.✨音乐</h1>
 
@@ -160,7 +160,7 @@
             <audio ref="audioPlayer" :src="currentPlayUrl" @ended="nextSong" @error="onPlayError" class="hidden"></audio>
         </div>
 
-        <!-- 播放列表 -->
+        <!-- 播放列表（你的11首歌曲全部在这里） -->
         <div class="glass-card rounded-3xl overflow-hidden mb-8">
             <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-black/30">
                 <div class="flex items-center gap-3">
@@ -220,19 +220,20 @@
         const { createApp, ref } = Vue;
         const PROXY = 'https://proxy.api.030101.xyz/';
 
-        // 创建雪花
+        // 创建雪花函数
         function createSnowflakes() {
             const container = document.getElementById('snow-container');
-            const snowChars = ['❄', '❅', '❆', '✽', '❉'];
-            for (let i = 0; i < 60; i++) {
+            if (!container) return;
+            const snowChars = ['❄︎', '❅', '❆', '✽', '❉', '❋'];
+            for (let i = 0; i < 70; i++) {
                 const flake = document.createElement('div');
                 flake.className = 'snowflake';
                 flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
                 flake.style.left = Math.random() * 100 + 'vw';
-                flake.style.animationDuration = (Math.random() * 8 + 8) + 's';
-                flake.style.animationDelay = '-' + Math.random() * 10 + 's';
-                flake.style.fontSize = (Math.random() * 1.2 + 0.8) + 'em';
-                flake.style.opacity = Math.random() * 0.6 + 0.4;
+                flake.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                flake.style.animationDelay = '-' + Math.random() * 15 + 's';
+                flake.style.fontSize = (Math.random() * 1.4 + 0.9) + 'em';
+                flake.style.opacity = Math.random() * 0.7 + 0.5;
                 container.appendChild(flake);
             }
         }
@@ -257,8 +258,8 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的11首歌曲
-                const specialPlaylist = [ /* ... 你的11首歌曲保持不变 ... */ 
+                // 你的11首上传歌曲（已完整加入）
+                const specialPlaylist = [
                     { id: 1001, name: "嘎嘎", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/yjarpu.flac" },
                     { id: 1002, name: "爱如星火", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/d5bklp.flac" },
                     { id: 1003, name: "那一年那一天", artist: "Eternity", cover: defaultCover, url: "https://files.catbox.moe/fawyem.flac" },
@@ -273,7 +274,9 @@
                 ];
 
                 playlist.value = [...specialPlaylist];
-                if (playlist.value.length > 0) setTimeout(() => playSong(0), 300);
+                if (playlist.value.length > 0) {
+                    setTimeout(() => playSong(0), 400);
+                }
 
                 const searchMusic = async () => {
                     if (!keyword.value.trim()) return alert('请输入歌名或歌手');
@@ -337,14 +340,39 @@
                     isPlaying.value = !isPlaying.value;
                 };
 
-                const nextSong = () => { let next = currentIndex.value + 1; if (next >= playlist.value.length) next = 0; playSong(next); };
-                const prevSong = () => { let prev = currentIndex.value - 1; if (prev < 0) prev = playlist.value.length - 1; playSong(prev); };
+                const nextSong = () => {
+                    let next = currentIndex.value + 1;
+                    if (next >= playlist.value.length) next = 0;
+                    playSong(next);
+                };
 
-                const addToPlaylistAndPlay = (song) => { playlist.value.push(song); playSong(playlist.value.length - 1); };
+                const prevSong = () => {
+                    let prev = currentIndex.value - 1;
+                    if (prev < 0) prev = playlist.value.length - 1;
+                    playSong(prev);
+                };
+
+                const addToPlaylistAndPlay = (song) => {
+                    playlist.value.push(song);
+                    playSong(playlist.value.length - 1);
+                };
+
                 const playFromPlaylist = (index) => playSong(index);
-                const removeFromPlaylist = (index) => { if (index === currentIndex.value) nextSong(); playlist.value.splice(index, 1); };
-                const clearPlaylist = () => { if (confirm('确定清空？')) { playlist.value = []; currentSong.value = null; isPlaying.value = false; } };
-                const onPlayError = () => { alert('播放失败，已跳下一首'); nextSong(); };
+                const removeFromPlaylist = (index) => {
+                    if (index === currentIndex.value) nextSong();
+                    playlist.value.splice(index, 1);
+                };
+                const clearPlaylist = () => {
+                    if (confirm('确定清空播放列表吗？')) {
+                        playlist.value = [];
+                        currentSong.value = null;
+                        isPlaying.value = false;
+                    }
+                };
+                const onPlayError = () => {
+                    alert('播放失败，已自动跳到下一首');
+                    nextSong();
+                };
 
                 return {
                     keyword, songs, loading, currentSong, currentPlayUrl, playlist, isPlaying,
@@ -354,7 +382,7 @@
                 };
             },
             mounted() {
-                // 初始化雪花
+                // 初始化雪花效果
                 createSnowflakes();
             }
         }).mount('#app');
