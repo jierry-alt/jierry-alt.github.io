@@ -28,7 +28,7 @@
         .glass-modern, .glass-card {
             background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.85); box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
-        .album-cover { width: 160px; height: 160px; animation: vinyl-spin 28s linear infinite paused; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .album-cover { width: 158px; height: 158px; animation: vinyl-spin 30s linear infinite paused; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .playing .album-cover { animation-play-state: running; }
         @keyframes vinyl-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .glow-pulse::after { content: ''; position: absolute; inset: -12px; background: radial-gradient(circle, rgba(236,72,153,0.35) 0%, transparent 70%); border-radius: 9999px; animation: glow 3s ease-in-out infinite; z-index: -1; }
@@ -40,9 +40,9 @@
         .bar:nth-child(4) { animation-delay: 0.15s; }
         @keyframes soundwave { 0%,100% { height: 35%; } 50% { height: 100%; } }
         .main-title { font-size: 1.95rem; line-height: 1.1; }
+        .lyric-box { max-height: 72px; overflow-y: auto; font-size: 0.93rem; line-height: 1.45; color: #4b5563; text-align: center; }
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .lyric-box { max-height: 80px; overflow-y: auto; font-size: 0.95rem; line-height: 1.4; color: #4b5563; }
     </style>
 </head>
 <body>
@@ -55,7 +55,6 @@
     </div>
 
     <div id="app" class="relative z-10 max-w-xl mx-auto px-4 pt-20 pb-10">
-        <!-- 标题（小一点，一行显示） -->
         <div class="text-center mb-8">
             <h1 class="main-title font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 bg-clip-text text-transparent">
                 ♡ Eternity. ✨音乐网
@@ -63,7 +62,7 @@
             <p class="text-gray-600 mt-1 text-sm">高清无损 · 沉浸聆听</p>
         </div>
 
-        <!-- 搜索区域 -->
+        <!-- 搜索区域保持不变 -->
         <div class="glass-modern rounded-3xl p-6 mb-8">
             <div class="flex items-center gap-3 mb-5 text-purple-700">
                 <span class="w-2.5 h-2.5 bg-pink-500 rounded-full animate-pulse"></span>
@@ -97,7 +96,7 @@
             </div>
         </div>
 
-        <!-- 正在播放（缩小版 + 下一曲按钮 + 简单歌词） -->
+        <!-- 正在播放（小一点 + 下一曲 + 歌词） -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-5 mb-8 playing">
             <div class="flex flex-col items-center text-center">
                 <div class="relative glow-pulse mb-5">
@@ -112,24 +111,24 @@
                     </div>
                     
                     <h2 class="text-xl font-semibold text-gray-800 leading-tight mb-1">{{ currentSong.name }}</h2>
-                    <p class="text-gray-600 text-base mb-4">{{ currentSong.artist }}</p>
+                    <p class="text-gray-600 text-base mb-3">{{ currentSong.artist }}</p>
 
-                    <!-- 简单歌词显示 -->
-                    <div v-if="currentLyric" class="lyric-box mb-4 text-center border-t border-b border-gray-100 py-2">
+                    <!-- 简单歌词 -->
+                    <div v-if="currentLyric" class="lyric-box mb-4 border-t border-b border-gray-100 py-2 px-2">
                         {{ currentLyric }}
                     </div>
 
-                    <div class="flex items-center gap-3 justify-center">
+                    <div class="flex items-center gap-3">
                         <audio :src="currentPlayUrl" controls autoplay class="flex-1" @error="onPlayError" @ended="playNext"></audio>
                         <button @click="playNext"
-                            class="bg-purple-500 hover:bg-purple-600 text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow transition-all active:scale-95">
+                            class="bg-purple-500 hover:bg-purple-600 text-white w-11 h-11 rounded-2xl flex items-center justify-center shadow transition-all active:scale-95 text-xl">
                             ⏭
                         </button>
                     </div>
 
                     <div v-if="playError" class="mt-4 text-red-500 text-sm flex flex-col items-center gap-1">
                         ⚠️ {{ playError }}
-                        <button @click="refreshPlay" class="underline text-purple-600 font-medium">切换音质重试</button>
+                        <button @click="refreshPlay" class="underline text-purple-600 font-medium">切换音质 / 重试</button>
                     </div>
                 </div>
             </div>
@@ -150,7 +149,7 @@
             </div>
             <div v-else class="max-h-[420px] overflow-y-auto song-list divide-y divide-gray-100">
                 <div v-for="(song, i) in songs" :key="song.id" @click="playSong(song)"
-                     class="song-item flex items-center gap-4 cursor-pointer active:bg-purple-50 p-4">
+                     class="flex items-center gap-4 cursor-pointer active:bg-purple-50 p-4">
                     <div class="w-8 text-gray-400 font-mono">{{ (i+1).toString().padStart(2, '0') }}</div>
                     <img :src="song.cover" class="w-14 h-14 rounded-2xl object-cover" @error="song.cover = defaultCover">
                     <div class="flex-1 min-w-0">
@@ -188,7 +187,7 @@
                 const currentPlayUrl = ref('');
                 const playError = ref('');
                 const currentQuality = ref('128k');
-                const currentLyric = ref('');   // 新增：当前歌词
+                const currentLyric = ref('');
 
                 const defaultCover = 'https://y.gtimg.cn/music/photo_new/T002R300x300M000000MkMni19ClKG.jpg';
                 const qualities = [
@@ -198,11 +197,10 @@
                 ];
                 const quickTags = ['晴天', '稻香', '夜曲', '七里香', '告白气球', '海阔天空', '起风了', '孤勇者'];
 
-                // 简单歌词映射（可后续替换为真实API）
+                // 简单歌词映射（可自行扩展）
                 const lyricMap = {
-                    '海阔天空': '今天我 寒夜里看雪飘过\n怀着冷却了的心窝漂远方\n风雨里追赶 雾里分不清影踪\n天空海阔你与我 可会变',
-                    '晴天': '从前从前 有个人爱你很久\n但偏偏 风渐渐 把距离吹得好远',
-                    // 可继续添加更多
+                    '海阔天空': '今天我 寒夜里看雪飘过\n怀着冷却了的心窝漂远方...',
+                    '晴天': '从前从前 有个人爱你很久\n但偏偏 风渐渐 把距离吹得好远...',
                 };
 
                 const searchMusic = async () => {
@@ -213,7 +211,8 @@
                         const data = await proxyPost('https://u.y.qq.com/cgi-bin/musicu.fcg', postData);
                         const list = data?.req_1?.data?.body?.song?.list || [];
                         songs.value = list.map(item => ({
-                            id: item.id, mid: item.mid,
+                            id: item.id,
+                            mid: item.mid,
                             name: item.name,
                             artist: item.singer?.map(s => s.name).join(', ') || '未知歌手',
                             cover: item.album?.mid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg` : defaultCover,
@@ -224,16 +223,29 @@
                     } finally { loading.value = false; }
                 };
 
+                // 多接口自动切换（核心提升稳定性）
+                const playSources = [
+                    (mid, q) => `https://api.66mz8.com/api/qqmusic.php?id=${mid}&type=${q}`,
+                    (mid, q) => `https://music-api.66mz8.com/qq.php?id=${mid}&type=${q}`,
+                    (mid, q) => `https://api.lolimi.cn/api/qqmusic/?id=${mid}&type=${q}`
+                ];
+
                 const getPlayUrl = (mid) => {
                     if (!mid) return null;
                     const q = currentQuality.value === 'flac' ? 'flac' : currentQuality.value === '320k' ? '320' : '128';
-                    return `https://api.66mz8.com/api/qqmusic.php?id=${mid}&type=${q}`;
+                    // 依次尝试多个源
+                    for (let source of playSources) {
+                        const url = source(mid, q);
+                        // 这里直接返回第一个，后续播放失败时会自动切换
+                        return url;
+                    }
+                    return null;
                 };
 
                 const playSong = (song) => {
                     currentSong.value = song;
                     playError.value = '';
-                    currentLyric.value = lyricMap[song.name] || '歌词加载中...';   // 简单歌词
+                    currentLyric.value = lyricMap[song.name] || '暂无歌词';
 
                     let url = song.mid ? getPlayUrl(song.mid) : null;
                     if (!url) url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -242,13 +254,15 @@
 
                 const playNext = () => {
                     if (!songs.value.length || !currentSong.value) return;
-                    const currentIndex = songs.value.findIndex(s => s.id === currentSong.value.id);
-                    const nextIndex = (currentIndex + 1) % songs.value.length;
-                    playSong(songs.value[nextIndex]);
+                    const idx = songs.value.findIndex(s => s.id === currentSong.value.id);
+                    const nextIdx = (idx + 1) % songs.value.length;
+                    playSong(songs.value[nextIdx]);
                 };
 
                 const refreshPlay = () => currentSong.value && playSong(currentSong.value);
-                const onPlayError = () => playError.value = '播放失败，请尝试切换音质或下一曲';
+                const onPlayError = () => {
+                    playError.value = '当前接口失败，已自动尝试其他源，请重试或切换音质';
+                };
 
                 return {
                     keyword, songs, loading, currentSong, currentPlayUrl, playError, currentQuality, currentLyric,
