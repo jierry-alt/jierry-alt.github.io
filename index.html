@@ -15,7 +15,7 @@
             min-height: 100vh; 
             position: relative; 
             color: #1f2937; 
-            padding-bottom: 40px;
+            padding-bottom: 60px;
         }
         body::before {
             content: ''; position: fixed; inset: 0;
@@ -49,13 +49,15 @@
         .main-title { font-size: 2.1rem; line-height: 1.1; }
 
         .song-item { 
-            padding: 16px 18px; 
+            padding: 18px 20px; 
             transition: all 0.2s;
         }
         .song-item:hover { background: rgba(168,85,247,0.15); }
 
         .loader { width: 28px; height: 28px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 0.9s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        audio { width: 100%; margin: 12px 0; }
     </style>
 </head>
 <body>
@@ -99,7 +101,7 @@
             </button>
         </div>
 
-        <!-- 简单播放器（已改回原版 + 自动下一首） -->
+        <!-- 简单播放器（原版 + 自动下一首） -->
         <div v-if="currentSong" class="glass-card rounded-3xl p-6 mb-8 playing">
             <div class="flex flex-col items-center">
                 <img :src="currentSong.cover" class="album-cover rounded-3xl object-cover ring-4 ring-white mb-6"
@@ -113,9 +115,9 @@
                            @error="playError = '播放失败，尝试下一首'" 
                            @ended="playNext"></audio>
 
-                    <div class="flex justify-center gap-8">
-                        <button @click="playPrev" class="text-3xl text-gray-600 hover:text-purple-600">⏮</button>
-                        <button @click="playNext" class="text-3xl text-purple-600 hover:scale-110 transition">⏭</button>
+                    <div class="flex justify-center gap-12">
+                        <button @click="playPrev" class="text-4xl text-gray-600 hover:text-purple-600">⏮</button>
+                        <button @click="playNext" class="text-4xl text-purple-600 hover:scale-110 transition">⏭</button>
                     </div>
                 </div>
             </div>
@@ -164,6 +166,7 @@
     <script>
         const { createApp, ref } = Vue;
 
+        // 适合手机的稳定跨域代理（已添加）
         const PROXY = 'https://corsproxy.io/?';
 
         createApp({
@@ -184,7 +187,6 @@
                     { value: 'flac', label: '无损' }
                 ];
 
-                // 你的11首上传歌曲
                 const recommendedSongs = ref([
                     { name: "嘎嘎", artist: "未知歌手", url: "https://files.catbox.moe/yjarpu.flac", cover: defaultCover },
                     { name: "爱如星火", artist: "未知歌手", url: "https://files.catbox.moe/d5bklp.flac", cover: defaultCover },
@@ -205,9 +207,15 @@
                     searchResults.value = [];
 
                     try {
-                        const postData = { req_1: { method: "DoSearchForQQMusicDesktop", module: "music.search.SearchCgiService", param: { num_per_page: 20, page_num: 1, query: keyword.value } } };
-                        const data = await axios.post(PROXY + encodeURIComponent('https://u.y.qq.com/cgi-bin/musicu.fcg'), postData);
-                        const list = data.data?.req_1?.data?.body?.song?.list || [];
+                        const postData = { 
+                            req_1: { 
+                                method: "DoSearchForQQMusicDesktop", 
+                                module: "music.search.SearchCgiService", 
+                                param: { num_per_page: 20, page_num: 1, query: keyword.value } 
+                            } 
+                        };
+                        const res = await axios.post(PROXY + encodeURIComponent('https://u.y.qq.com/cgi-bin/musicu.fcg'), postData);
+                        const list = res.data?.req_1?.data?.body?.song?.list || [];
                         searchResults.value = list.map(item => ({
                             mid: item.mid,
                             name: item.name,
@@ -215,7 +223,7 @@
                             cover: defaultCover
                         }));
                     } catch (e) {
-                        alert('搜索失败，请稍后重试');
+                        alert('搜索失败，请稍后重试或换关键词');
                     } finally {
                         loading.value = false;
                     }
@@ -235,21 +243,21 @@
                 const playNext = () => {
                     if (!currentSong.value || !recommendedSongs.value.length) return;
                     const idx = recommendedSongs.value.findIndex(s => s.name === currentSong.value.name);
-                    const nextIdx = idx === -1 ? 0 : (idx + 1) % recommendedSongs.value.length;
+                    const nextIdx = (idx + 1) % recommendedSongs.value.length;
                     playSong(recommendedSongs.value[nextIdx]);
                 };
 
                 const playPrev = () => {
                     if (!currentSong.value || !recommendedSongs.value.length) return;
                     const idx = recommendedSongs.value.findIndex(s => s.name === currentSong.value.name);
-                    const prevIdx = idx === -1 ? 0 : (idx - 1 + recommendedSongs.value.length) % recommendedSongs.value.length;
+                    const prevIdx = (idx - 1 + recommendedSongs.value.length) % recommendedSongs.value.length;
                     playSong(recommendedSongs.value[prevIdx]);
                 };
 
                 // 默认播放第一首你的歌曲
                 setTimeout(() => {
                     if (recommendedSongs.value.length) playSong(recommendedSongs.value[0]);
-                }, 300);
+                }, 400);
 
                 return {
                     keyword, loading, currentSong, currentPlayUrl, currentQuality,
